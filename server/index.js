@@ -48,15 +48,30 @@ if (!process.env.JWT_SECRET) {
 const app = express();
 
 // ===============================
-// 6️⃣ Middleware
+// 6️⃣ Middleware (সংশোধিত CORS লজিক)
 // ===============================
+
+// ✅ CORS Whitelist তৈরি করা হলো
+const allowedOrigins = [
+    'http://localhost:5173', 
+    'http://localhost:5178', 
+    'https://coinhousemarket.com',
+];
+
+// ✅ CORS কনফিগারেশন: ফ্লেক্সিবল লজিক ব্যবহার করা হলো যাতে সব লোকাল রিকোয়েস্ট গ্রহণ করে
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL || "http://localhost:5173",
-      "http://localhost:5178",
-      "https://coinhousemarket.com",
-    ],
+    origin: (origin, callback) => {
+        // যদি রিকোয়েস্টটি লোকালহোস্ট থেকে আসে (যেমন: postman বা সার্ভার-টু-সার্ভার)
+        // অথবা হোয়াইট লিস্টে থাকে, তবে অনুমতি দিন
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            // অন্য কোনো ডোমেন হলে ব্লক করুন
+            console.log(`❌ CORS blocked origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
   })
 );

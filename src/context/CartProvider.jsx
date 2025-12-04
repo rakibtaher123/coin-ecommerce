@@ -1,44 +1,93 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// ১. কনটেক্সট তৈরি
 const CartContext = createContext();
 
+// ২. হুক তৈরি (Consumer)
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used inside CartProvider");
+  }
+  return context;
+};
+
+// ৩. প্রোভাইডার তৈরি (Provider)
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState(() => {
+  // --- State Initialization ---
+  const [cartItems, setCartItems] = useState(() => {
     try {
       const raw = localStorage.getItem('cart');
       return raw ? JSON.parse(raw) : [];
     } catch (err) {
+      console.error("Failed to load cart from localStorage", err);
       return [];
     }
   });
 
-  // কার্টে যোগ করার ফাংশন
-  const addToCart = (product) => {
-    setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.id === product.id);
-      if (existingItem) {
-        console.log("Item already added to cart!");
-        return prevCart;
+  // --- Local Storage Save ---
+  useEffect(() => {
+    try {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    } catch (err) {
+      console.error("Failed to save cart to localStorage", err);
+    }
+  }, [cartItems]);
+
+  // --- Core Logic ---
+  const addToCart = (product, quantityToAdd = 1) => {
+    const qty = parseInt(quantityToAdd, 10);
+    if (isNaN(qty) || qty < 1) return;
+
+    setCartItems((prevItems) => {
+      const itemExists = prevItems.find((item) => item.id === product.id);
+
+      if (itemExists) {
+        return prevItems.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + qty }
+            : item
+        );
       }
-      return [...prevCart, product];
+
+      return [...prevItems, { ...product, quantity: qty }];
     });
   };
 
-  // কার্ট থেকে ডিলিট করার ফাংশন
   const removeFromCart = (productId) => {
-    setCart((prev) => prev.filter((item) => item.id !== productId));
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.id !== productId)
+    );
   };
 
-  // Persist cart to localStorage when it changes
-  useEffect(() => {
-    try { localStorage.setItem('cart', JSON.stringify(cart)); } catch (err) { /* ignore */ }
-  }, [cart]);
+  const clearCart = () => setCartItems([]);
+
+  // --- Calculations ---
+  const itemCount = (cartItems || []).reduce(
+    (total, item) => total + (item.quantity || 0),
+    0
+  );
+
+  const totalPrice = (cartItems || []).reduce(
+    (total, item) =>
+      total + (item.price || 0) * (item.quantity || 0),
+    0
+  );
+
+  const value = {
+    items: cartItems,
+    addToCart,
+    removeFromCart,
+    clearCart,
+    itemCount,
+    totalPrice
+  };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );
 };
 
-export const useCart = () => useContext(CartContext);
+export default CartProvider;

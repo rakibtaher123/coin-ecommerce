@@ -1,44 +1,48 @@
 import './App.css'; 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { CartProvider } from './context/CartContext';
+import { CartProvider } from './context/CartProvider';
 
-// 🔥 সঠিক হেডার ফাইল ইমপোর্ট
+// 🔥 Components
 import Header from './components/Header'; 
+import ProtectedRoute from './components/ProtectedRoute';
 
-// 🛒 ক্লায়েন্ট পেজগুলো
+// 🛒 Client Pages
 import HomePage from './pages/HomePage';
+import CartPage from './pages/CartPage';          // ✅ ADD THIS
 import CheckoutPage from './pages/CheckoutPage';
 import OrderStatusPage from './pages/OrderStatusPage';
-import SignupPage from './pages/SignupPage'; 
+import SignupPage from './pages/SignupPage';
+import UserLogin from './pages/LoginPage';        // ✅ USER LOGIN আলাদা রাখা হলো
 
-// 🔐 অ্যাডমিন পেজগুলো (Admin ফোল্ডার থেকে সঠিক path)
+// 🔐 Admin Pages
 import AdminLogin from '../../Admin/pages/AdminLogin'; 
 import Dashboard from '../../Admin/pages/Dashboard';
 import ManageProducts from '../../Admin/pages/ManageProducts';
 import ViewOrders from '../../Admin/pages/ViewOrders'; 
-
-// 🔒 ProtectedRoute wrapper
-import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <CartProvider>
       <Router>
         <Header />
+
         <Routes>
-          {/* =========================
-              পাবলিক/ক্লায়েন্ট রাউটস 
-             ========================= */}
+          {/* =================
+              CLIENT ROUTES
+             ================= */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/cart" element={<CartPage />} />         {/* ✅ REQUIRED */}
           <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/signup" element={<SignupPage />} /> 
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<UserLogin />} />       {/* ✅ USER LOGIN */}
           <Route path="/my-orders" element={<OrderStatusPage />} />
 
-          {/* =========================
-              অ্যাডমিন রাউটস (Secure)
-             ========================= */}
-          <Route path="/login" element={<AdminLogin />} />
+          {/* =================
+              ADMIN ROUTES
+             ================= */}
+          <Route path="/admin-login" element={<AdminLogin />} />
+
           <Route 
             path="/admin" 
             element={
@@ -47,6 +51,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+
           <Route 
             path="/products" 
             element={
@@ -55,6 +60,7 @@ function App() {
               </ProtectedRoute>
             } 
           />
+
           <Route 
             path="/orders" 
             element={

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box, IconButton, InputBase } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, InputBase, Badge } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -25,7 +25,9 @@ export const HISTORICAL_CATEGORIES = [
 const Navbar = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const { cart } = useCart();
+  
+  // ✅ FIX: আমরা 'itemCount' আনছি, কারণ Provider এ 'cart' নামে কিছু নেই, আছে 'items'
+  const { itemCount } = useCart();
 
   // ✅ Read user from localStorage
   let user = null;
@@ -108,25 +110,11 @@ const Navbar = () => {
             <NotificationsIcon />
           </IconButton>
 
-          <IconButton color="inherit" onClick={() => navigate('/cart')} sx={{ position: 'relative' }}>
-            <ShoppingCartIcon />
-            <Typography
-              variant="body2"
-              sx={{
-                position: 'absolute',
-                top: 5,
-                right: 0,
-                fontSize: 12,
-                bgcolor: 'red',
-                borderRadius: '50%',
-                width: 18,
-                height: 18,
-                textAlign: 'center',
-                color: 'white',
-              }}
-            >
-              {cart?.length || 0}
-            </Typography>
+          {/* ✅ FIXED: Cart Icon with Badge */}
+          <IconButton color="inherit" onClick={() => navigate('/cart')}>
+            <Badge badgeContent={itemCount} color="error">
+              <ShoppingCartIcon />
+            </Badge>
           </IconButton>
 
           {/* ✅ Auth Buttons */}

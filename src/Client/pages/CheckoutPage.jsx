@@ -1,9 +1,12 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CartContext } from '../context/CartContext';
+// আপনার CartProvider থেকে useCart ইম্পোর্ট করুন
+import { useCart } from '../context/CartProvider';
 
 const CheckoutPage = () => {
-  const { cart, clearCart } = useContext(CartContext);
+  // আগের কোডে useCart() ব্যবহার করা ভালো, কারণ আপনি Context ওভাবেই বানিয়েছেন
+  // items: কার্টের প্রোডাক্ট লিস্ট, totalPrice: মোট দাম (যা প্রোভাইডারে করা আছে)
+  const { items, totalPrice, clearCart } = useCart(); 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -16,8 +19,8 @@ const CheckoutPage = () => {
   const [paymentMethod, setPaymentMethod] = useState('cod'); 
   const [trxId, setTrxId] = useState('');
 
-  // ✅ মোট দাম হিসাব করা (quantity সহ)
-  const totalPrice = cart.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);
+  // আপনার প্রোভাইডার যদি totalPrice না দেয়, তবে ব্যাকআপ হিসেবে এখানে হিসাব করা হলো
+  const calculatedTotal = totalPrice || items.reduce((acc, item) => acc + (item.price * (item.quantity || 1)), 0);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,7 +30,7 @@ const CheckoutPage = () => {
     e.preventDefault();
 
     if ((paymentMethod === 'bkash' || paymentMethod === 'rocket') && !trxId) {
-      console.log("Please enter your Transaction ID!");
+      alert("Please enter your Transaction ID!"); // console.log এর বদলে alert দেওয়া ভালো ইউজার দেখার জন্য
       return;
     }
 
@@ -36,15 +39,15 @@ const CheckoutPage = () => {
       email: formData.email,
       mobile: formData.mobile,
       address: formData.address,
-      products: cart,
-      totalPrice,
+      products: items, // 'cart' এর বদলে 'items'
+      totalPrice: calculatedTotal,
       paymentMethod,
       transactionId: paymentMethod === 'cod' ? '' : trxId,
       status: 'Pending'
     };
 
     try {
-      const token = localStorage.getItem("token"); // ✅ JWT token
+      const token = localStorage.getItem("token");
       const response = await fetch('http://localhost:5000/orders', {
         method: 'POST',
         headers: { 
@@ -57,19 +60,19 @@ const CheckoutPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        console.log("🎉 Order Placed Successfully!");
-        if (clearCart) clearCart();
+        alert("🎉 Order Placed Successfully!");
+        if (clearCart) clearCart(); // কার্ট ক্লিয়ার করা
         navigate('/');
       } else {
-        console.log(data.error || "Failed to place order. Try again.");
+        alert(data.error || "Failed to place order. Try again.");
       }
     } catch (error) {
       console.error("Order Error:", error);
-      console.log("Server Error! Make sure backend is running.");
+      alert("Server Error! Make sure backend is running.");
     }
   };
 
-  if (cart.length === 0) {
+  if (!items || items.length === 0) {
     return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Your cart is empty! 🛒</h2>;
   }
 
@@ -105,7 +108,7 @@ const CheckoutPage = () => {
         
         <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
           <h3>Order Summary</h3>
-          {cart.map((item, index) => (
+          {items.map((item, index) => (
             <div key={index} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', padding: '10px 0', fontSize: '14px' }}>
               <span>{item.name} x {item.quantity || 1}</span>
               <span>৳{item.price * (item.quantity || 1)}</span>
@@ -113,7 +116,7 @@ const CheckoutPage = () => {
           ))}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '15px', fontWeight: 'bold', fontSize: '18px', color: '#d97706' }}>
             <span>Total:</span>
-            <span>৳ {totalPrice}</span>
+            <span>৳ {calculatedTotal}</span>
           </div>
         </div>
 
@@ -140,7 +143,7 @@ const CheckoutPage = () => {
           {(paymentMethod === 'bkash' || paymentMethod === 'rocket') && (
             <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#fff7ed', borderRadius: '5px', border: '1px solid orange' }}>
               <p style={{ fontSize: '12px', margin: '0 0 5px 0' }}>
-                Please send <strong>৳{totalPrice}</strong> to <br/> 
+                Please send <strong>৳{calculatedTotal}</strong> to <br/> 
                 <strong>017XXXXXXXX (Personal)</strong> using "Send Money".
               </p>
               <input 
@@ -166,6 +169,7 @@ const CheckoutPage = () => {
   );
 };
 
+// স্টাইলগুলো নিচে ডিফাইন করা হলো
 const inputStyle = {
   width: '100%',
   padding: '10px',
@@ -175,3 +179,15 @@ const inputStyle = {
   outline: 'none'
 };
 
+// আপনার কোডে এই স্টাইলটি মিসিং ছিল
+const radioStyle = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  padding: '10px',
+  borderRadius: '5px',
+  cursor: 'pointer',
+  transition: 'border 0.2s ease-in-out'
+};
+
+export default CheckoutPage;

@@ -14,6 +14,9 @@ const coinData = {
       details:
         "Location: Dhaka, Bangladesh; Period: Bengal Sultanate; Type: Silver tanka; Condition: VF; Rarity: Scarce; Notes: Struck under local authority, clear legends."
     },
+
+    
+  
     {
       id: "ab2",
       image: "azam_shah_tanka.jpg",

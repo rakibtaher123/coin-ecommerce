@@ -1,33 +1,34 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ProductCard from '../components/ProductCard'; // আমাদের ঠিক করা কার্ড কম্পোনেন্ট
-import coinData from '../dataWithMeta'; // enriched data import
+import ProductCard from '../components/ProductCard';
+import coinData from '../dataWithMeta'; // নিশ্চিত করো পাথ ঠিক আছে
 
 const HomePage = () => {
   const navigate = useNavigate();
 
-  // --- লজিক: ডাটা ফাইল থেকে অটোমেটিক কিছু ফিচারড প্রোডাক্ট তৈরি করা ---
+  // --- Featured Products Logic ---
   const getFeaturedProducts = () => {
+    if (!coinData) return []; // ডাটা না থাকলে এরর এড়াতে
+    
     const featured = [];
-    const categories = Object.keys(coinData); // সব ক্যাটাগরির নাম নেওয়া হলো (যেমন: ancient_bengal)
+    const categories = Object.keys(coinData);
 
-    // প্রথম ৬টি ক্যাটাগরি থেকে ১টি করে প্রোডাক্ট নিয়ে ফিচারড লিস্ট বানানো হচ্ছে
+    // প্রথম ৬টি ক্যাটাগরি থেকে ১টি করে প্রোডাক্ট নেওয়া
     categories.slice(0, 6).forEach((categoryKey) => {
       const items = coinData[categoryKey];
-      
-      // যদি ওই ক্যাটাগরিতে কোনো প্রোডাক্ট থাকে
+
       if (items && items.length > 0) {
-        const firstItem = items[0]; 
+        const firstItem = items[0];
         
-        // আমরা পুরো প্রোডাক্ট অবজেক্টটি নেব এবং সাথে ক্যাটাগরি নামটা যোগ করে দেব
-        // যাতে ProductCard ছবি খুঁজে পায়
+        // প্রোডাক্টের সাথে ক্যাটাগরি ফোল্ডারের নাম যুক্ত করা হচ্ছে
         featured.push({
-          ...firstItem,       // id, image, name, price এখান থেকে আসবে
-          categoryFolder: categoryKey // ফোল্ডারের নাম (যেমন: ancient_bengal) আলাদাভাবে রাখলাম
+          ...firstItem,
+          categoryFolder: categoryKey, 
         });
       }
     });
+
     return featured;
   };
 
@@ -36,75 +37,76 @@ const HomePage = () => {
   return (
     <Box sx={{ backgroundColor: '#e3f2fd', minHeight: '100vh', pt: 4, pb: 8 }}>
       
-      {/* Welcome Section */}
+      {/* --- Welcome Section --- */}
       <Container maxWidth="md">
-        <Box 
-          sx={{ 
-            backgroundColor: '#fffde7', 
-            color: '#1b5e20', 
-            py: 8, 
-            textAlign: 'center', 
+        <Box
+          sx={{
+            backgroundColor: '#fffde7',
+            color: '#1b5e20',
+            py: 8,
+            textAlign: 'center',
             mb: 6,
-            borderRadius: '12px', 
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)' 
+            borderRadius: '12px',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
           }}
         >
-          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h3" fontWeight="bold" gutterBottom>
             Welcome to CoinHouseMarket
           </Typography>
-          <Typography variant="h6" component="p" sx={{ color: '#555' }}>
+          <Typography variant="h6" sx={{ color: '#555' }}>
             produced by Rakib
           </Typography>
         </Box>
       </Container>
 
-      {/* Featured Coins Section */}
+      {/* --- Featured Products Grid --- */}
       <Container maxWidth="lg" sx={{ my: 4 }}>
-        {/* Section Header */}
         <Box sx={{ textAlign: 'center', mb: 5 }}>
-          <Box sx={{ 
-            bgcolor: '#1b5e20', 
-            py: 1.5, 
-            px: 5, 
-            borderRadius: '50px', 
-            display: 'inline-block',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
-          }}>
-            <Typography variant="h5" sx={{ color: 'white', fontWeight: 'bold', textTransform: 'uppercase' }}>
+          <Box
+            sx={{
+              bgcolor: '#1b5e20',
+              py: 1.5,
+              px: 5,
+              borderRadius: '50px',
+              display: 'inline-block',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.2)',
+            }}
+          >
+            <Typography
+              variant="h5"
+              sx={{ color: 'white', fontWeight: 'bold', textTransform: 'uppercase' }}
+            >
               Featured Collections
             </Typography>
           </Box>
         </Box>
 
-        {/* Product Grid using ProductCard Component */}
         <Grid container spacing={4} justifyContent="center">
           {featuredProducts.map((product) => (
             <Grid item key={product.id} xs={12} sm={6} md={4}>
-              
-              {/* ✅ সংশোধন: এখানে আমরা এখন সঠিক Props পাঠাচ্ছি */}
-              <ProductCard 
-                 product={product}              // পুরো প্রোডাক্ট ডাটা পাঠালাম
-                 category={product.categoryFolder} // ফোল্ডারের নাম পাঠালাম যাতে ছবি পায়
+              {/* ✅ ProductCard এ ডাটা পাস করা হচ্ছে */}
+              <ProductCard
+                product={product} 
+                category={product.categoryFolder} // এই লাইনটি Add to Cart এবং Image লোড করার জন্য জরুরি
               />
-
             </Grid>
           ))}
         </Grid>
 
-        {/* Explore All Button */}
+        {/* --- Explore Button --- */}
         <Box sx={{ textAlign: 'center', mt: 8 }}>
-          <Button 
-            variant="contained" 
-            size="large" 
-            // এখানে আপনি চাইলে '/eshop' বা '/category' পেজে নিতে পারেন
-            onClick={() => navigate('/eshop')} 
-            sx={{ 
-              bgcolor: '#1b5e20', 
-              '&:hover': { bgcolor: '#004d40' }, 
-              px: 5, py: 1.5,
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => navigate('/eshop')}
+            sx={{
+              bgcolor: '#1b5e20',
+              '&:hover': { bgcolor: '#004d40' },
+              px: 5,
+              py: 1.5,
               fontWeight: 'bold',
               fontSize: '1.1rem',
-              borderRadius: '8px'
+              borderRadius: '8px',
             }}
           >
             EXPLORE ALL COINS &gt;

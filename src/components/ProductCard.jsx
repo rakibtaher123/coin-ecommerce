@@ -1,70 +1,115 @@
-import React from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, CardActions } from '@mui/material';
+import React, { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  CardActions,
+  TextField,
+  Box, // Box import is good practice for container styling
+} from '@mui/material';
 import { AddShoppingCart } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartProvider';
+import { useCart } from '../context/CartProvider'; 
 
 function ProductCard({ product, category }) {
   const navigate = useNavigate();
-  const cart = useCart();
+  // useCart hook correctly consumes the context values
+  const { addToCart } = useCart(); 
+  const [qty, setQty] = useState(1);
 
-  // ⚠️ Safety Check
-  if (!product) {
-    return null;
-  }
+  // Safety check: if the product data isn't passed, don't render anything
+  if (!product || !product.id) return null;
 
   const handleViewDetails = () => {
-    // ✅ MongoDB থেকে আসা ডাটায় _id থাকে
-    navigate(`/product/${product._id}`);
+    navigate(`/product/${product.id}`);
   };
 
   const handleAddToCart = () => {
-    cart.addToCart({ ...product, category });
+    // 1. Quantity validation
+    if (qty < 1 || !product.price) {
+        alert("Quantity must be 1 or more, or product price is missing.");
+        return;
+    }
+    
+    // 2. Data check for debugging (HELPER FOR YOU)
+    const itemToAdd = { 
+        ...product, 
+        category: category,
+        // Ensure price is treated as a number before sending to cart
+        price: Number(product.price)
+    };
+    
+    console.log('Attempting to add to cart:', itemToAdd, 'Quantity:', qty);
+
+    // 3. Call Context function
+    addToCart(itemToAdd, qty);
   };
 
-  // ✅ ছবির সঠিক পাথ তৈরি করা
-  const imagePath = category 
-    ? `/assets/${category}/${product.image}` 
+  // Image path construction
+  const imagePath = category
+    ? `/assets/${category}/${product.image}`
     : `/assets/${product.image}`;
 
+  // Ensure price is a number for formatting safety
+  const displayPrice = Number(product.price) || 0;
+
+
   return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} elevation={2}>
+    <Card sx={{ width: 260, m: 'auto' }} elevation={3}>
       <CardMedia
         component="img"
         height="200"
-        image={imagePath || "https://via.placeholder.com/200?text=No+Image"}
+        image={imagePath || 'https://via.placeholder.com/200'}
         alt={product.name}
         onClick={handleViewDetails}
         sx={{ cursor: 'pointer', objectFit: 'cover' }}
-        onError={(e) => { e.target.src = "https://via.placeholder.com/200?text=No+Image"; }}
+        onError={(e) => { 
+          e.target.src = 'https://via.placeholder.com/200'; // Fallback image
+        }}
       />
-      <CardContent sx={{ flexGrow: 1 }}>
+
+      <CardContent sx={{ pb: 1 }}>
         <Typography 
-          gutterBottom 
-          variant="h6" 
-          component="div" 
-          sx={{ cursor: 'pointer', fontSize: '1rem', fontWeight: 'bold' }} 
+          fontWeight="bold" 
+          sx={{ cursor: 'pointer', height: 40, overflow: 'hidden' }} 
           onClick={handleViewDetails}
         >
           {product.name}
         </Typography>
-        
-        {(product.year || product.details) && (
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            {product.year ? `Year: ${product.year}` : ''}
-            {product.details ? (product.year ? ` • ${product.details}` : product.details) : ''}
-          </Typography>
-        )}
 
-        <Typography variant="h6" color="primary" sx={{ marginY: 1, fontWeight: 'bold' }}>
-          ৳{product.price}
+        <Typography color="primary" variant="h6" fontWeight="bold" sx={{ my: 1 }}>
+          ৳{displayPrice.toLocaleString()} 
         </Typography>
+
+        <TextField
+          type="number"
+          size="small"
+          label="Qty"
+          value={qty}
+          inputProps={{ min: 1 }}
+          // Ensure quantity is updated as a Number
+          onChange={(e) => {
+            const val = Number(e.target.value);
+            setQty(val > 0 ? val : 1);
+          }}
+          sx={{ width: '90px' }}
+        />
       </CardContent>
-      <CardActions>
+
+      <CardActions sx={{ justifyContent: 'space-between', pt: 0 }}>
         <Button size="small" variant="outlined" onClick={handleViewDetails}>
           View Details
         </Button>
-        <Button size="small" variant="contained" startIcon={<AddShoppingCart />} onClick={handleAddToCart}>
+
+        <Button
+          size="small"
+          variant="contained"
+          color="primary"
+          startIcon={<AddShoppingCart />}
+          onClick={handleAddToCart}
+        >
           Add
         </Button>
       </CardActions>

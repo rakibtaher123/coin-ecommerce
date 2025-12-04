@@ -1,17 +1,16 @@
 import React, { useState } from 'react';
-import { Box, Container, Grid, Card, CardMedia, CardContent, Typography, Button, TextField } from '@mui/material';
+import { Box, Container, Grid, Card, CardMedia, Typography, Button, TextField } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import coinData from '../dataWithMeta';
-import { useCart } from '../context/CartProvider';
+import { useCart } from '../context/CartProvider'; // আপনার ফাইলের নাম অনুযায়ী পাথ ঠিক রাখবেন
 
-// Product detail page. Shows year, description, price and Add to Cart.
 const ProductPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const cart = useCart();
-  const [qty, setQty] = useState(1);
+  const [qty, setQty] = useState(1); // ডিফল্ট ১
 
-  // find product across categories
+  // Find product logic
   let product = null;
   let productCategory = null;
   Object.keys(coinData).some((cat) => {
@@ -35,9 +34,16 @@ const ProductPage = () => {
 
   const imagePath = productCategory ? `/assets/${productCategory}/${product.image}` : `/assets/${product.image}`;
 
+  // ✅ এই অংশটি এখন একদম সঠিক আছে
   const handleAddToCart = () => {
-    const item = { ...product, category: productCategory, quantity: qty };
-    cart.addToCart(item);
+    // ১. প্রোডাক্টের সাথে ক্যাটাগরি যুক্ত করা হলো (quantity এখানে হার্ডকোড করা নেই)
+    const productToSave = { ...product, category: productCategory };
+    
+    // ২. addToCart ফাংশনে প্রোডাক্ট এবং quantity আলাদাভাবে পাঠানো হলো
+    // এটি CartContext এর addToCart(product, qty) এর সাথে মিলবে
+    cart.addToCart(productToSave, qty); 
+    
+    // ৩. কার্ট পেজে নিয়ে যাওয়া
     navigate('/cart');
   };
 
@@ -74,6 +80,7 @@ const ProductPage = () => {
                 label="Quantity"
                 type="number"
                 value={qty}
+                // ইনপুট লজিক ঠিক রাখা হয়েছে যাতে ১ এর নিচে না নামে
                 onChange={(e) => setQty(Math.max(1, parseInt(e.target.value || '1', 10)))}
                 inputProps={{ min: 1 }}
                 sx={{ width: 120 }}
@@ -98,4 +105,5 @@ const ProductPage = () => {
   );
 };
 
+// ✅ টাইপো ফিক্স করা হয়েছে: Productpage -> ProductPage
 export default ProductPage;

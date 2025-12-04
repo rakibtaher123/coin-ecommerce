@@ -4,13 +4,14 @@ import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 
-// Use public/assets paths
-const PAYMENT_ICONS = [
+// Mobile Banking Icons (Local)
+const MOBILE_PAYMENT_ICONS = [
   { name: 'bKash', url: '/assets/logos/bkash.png', alt: 'bKash Payment' },
   { name: 'Nagad', url: '/assets/logos/nagad.png', alt: 'Nagad Payment' },
   { name: 'Rocket', url: '/assets/logos/rocket.png', alt: 'Rocket Payment' },
 ];
 
+// Courier Services
 const COURIER_ICONS = [
   { name: 'Redx', url: 'https://placehold.co/100x60/C2185B/FFFFFF?text=Redx', alt: 'Redx Courier' },
   { name: 'Pathao', url: 'https://placehold.co/100x60/FF9800/FFFFFF?text=Pathao+Courier', alt: 'Pathao Courier' },
@@ -28,7 +29,7 @@ const Footer = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
               CoinHouseMarket
             </Typography>
-            <Typography variant="body2" sx={{ mb: 2 }}>
+            <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
               পুরাতন এবং দুষ্প্রাপ্য মুদ্রা কেনার একটি বিশ্বস্ত প্রতিষ্ঠান। আমাদের কালেকশন দেখুন এবং ইতিহাসের একটি অংশ নিজের করে নিন।
             </Typography>
           </Grid>
@@ -38,11 +39,11 @@ const Footer = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
               Quick Links
             </Typography>
-            <Box>
-              <Link href="/" color="inherit" underline="hover" display="block">Home</Link>
-              <Link href="/eshop" color="inherit" underline="hover" display="block">Show All Coins</Link>
-              <Link href="/about" color="inherit" underline="hover" display="block">About Us</Link>
-              <Link href="/contact" color="inherit" underline="hover" display="block">Contact Us</Link>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+              <Link href="/" color="inherit" underline="hover">Home</Link>
+              <Link href="/eshop" color="inherit" underline="hover">Show All Coins</Link>
+              <Link href="/about" color="inherit" underline="hover">About Us</Link>
+              <Link href="/contact" color="inherit" underline="hover">Contact Us</Link>
             </Box>
           </Grid>
 
@@ -51,16 +52,16 @@ const Footer = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
               Contact Us
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" paragraph>
               329,300 DIT Industrial Area (Tongi Factory), Tongi, Dhaka.
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" sx={{ mb: 0.5 }}>
               Email: <Link href="mailto:rakibtaher27@gmail.com" color="inherit" underline="hover">rakibtaher27@gmail.com</Link>
             </Typography>
             <Typography variant="body2">
               Phone: +8801945403413
             </Typography>
-            <Box sx={{ mt: 1 }}>
+            <Box sx={{ mt: 2 }}>
               <IconButton color="inherit" href="https://facebook.com" target="_blank"><FacebookIcon /></IconButton>
               <IconButton color="inherit" href="https://twitter.com" target="_blank"><TwitterIcon /></IconButton>
               <IconButton color="inherit" href="https://instagram.com" target="_blank"><InstagramIcon /></IconButton>
@@ -68,48 +69,76 @@ const Footer = () => {
           </Grid>
         </Grid>
 
-        {/* Payment Icons */}
-        <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3, mt: 4, textAlign: 'center' }}>
-          <Typography variant="subtitle1" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
-            Secured Mobile Payments
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
-            {PAYMENT_ICONS.map(icon => (
-              <Box key={icon.name} sx={{
-                width: 100, height: 60, backgroundColor: 'white', borderRadius: '12px',
-                p: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.4)', transition: 'transform 0.2s',
-                '&:hover': { transform: 'scale(1.05)' }
-              }}>
-                <img 
-                  src={icon.url} 
-                  alt={icon.alt} 
-                  style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
-                  onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/AAAAAA/FFFFFF?text=Logo"; }}
-                />
+        {/* --- Payments Section --- */}
+        <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', pt: 4, mt: 5, textAlign: 'center' }}>
+          
+          <Grid container spacing={4} justifyContent="center">
+            {/* 1. Mobile Payments */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+                Secured Mobile Payments
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
+                {MOBILE_PAYMENT_ICONS.map(icon => (
+                  <Box key={icon.name} sx={{
+                    width: 80, height: 50, backgroundColor: 'white', borderRadius: '8px',
+                    p: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'transform 0.2s',
+                    '&:hover': { transform: 'scale(1.05)' }
+                  }}>
+                    <img 
+                      src={icon.url} 
+                      alt={icon.alt} 
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                      onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/AAAAAA/FFFFFF?text=" + icon.name; }}
+                    />
+                  </Box>
+                ))}
               </Box>
-            ))}
-          </Box>
+            </Grid>
+
+            {/* 2. Global & PayPal */}
+            <Grid item xs={12} md={6}>
+              <Typography variant="subtitle1" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+                Global & Local Payments
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
+                <Box sx={{
+                  width: 80, height: 50, backgroundColor: 'white', borderRadius: '8px',
+                  p: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'transform 0.2s',
+                  '&:hover': { transform: 'scale(1.05)' }
+                }}>
+                  <img 
+                    src="/assets/logos/paypal.jpg" 
+                    alt="PayPal" 
+                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                    onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/003087/FFFFFF?text=PayPal"; }}
+                  />
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
         </Box>
 
-        {/* Courier Icons */}
-        <Box sx={{ pt: 3, mt: 4, textAlign: 'center' }}>
+        {/* --- Courier Section --- */}
+        <Box sx={{ pt: 4, mt: 0, textAlign: 'center' }}>
           <Typography variant="subtitle1" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
             Reliable Delivery Partners
           </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 3, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
             {COURIER_ICONS.map(icon => (
               <Box key={icon.name} sx={{
-                width: 120, height: 60, backgroundColor: 'white', borderRadius: '12px',
+                width: 100, height: 50, backgroundColor: 'white', borderRadius: '8px',
                 p: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.4)', transition: 'transform 0.2s',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'transform 0.2s',
                 '&:hover': { transform: 'scale(1.05)' }
               }}>
                 <img 
                   src={icon.url} 
                   alt={icon.alt} 
-                  style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
-                  onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/AAAAAA/FFFFFF?text=Service"; }}
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                  onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/AAAAAA/FFFFFF?text=Courier"; }}
                 />
               </Box>
             ))}
@@ -117,9 +146,9 @@ const Footer = () => {
         </Box>
 
         {/* Copyright */}
-        <Box sx={{ textAlign: 'center', pt: 3, mt: 3, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-          <Typography variant="caption">
-            &copy; 2025 CoinHouseMarket. All rights reserved.
+        <Box sx={{ textAlign: 'center', pt: 4, mt: 4, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <Typography variant="caption" sx={{ opacity: 0.8 }}>
+            &copy; {new Date().getFullYear()} CoinHouseMarket. All rights reserved.
           </Typography>
         </Box>
       </Container>
