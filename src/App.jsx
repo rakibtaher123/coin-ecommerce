@@ -1,5 +1,6 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
+import AllProductsPage from './pages/AllProductsPage'; // নতুন ইম্পোর্ট
 
 // ❌ এই লাইনটি মুছে দাও বা কমেন্ট করো, কারণ main.jsx এ প্রোভাইডার আছে
 // import { CartProvider } from './context/CartProvider'; 
@@ -39,6 +40,10 @@ function App() {
           <Route path="/contact" element={<ContactUsPage />} />
 
           <Route path="/eshop" element={<EshopPage />} />
+          
+          {/* ✅ এই নতুন লাইনটি যোগ করা হয়েছে "Browse Complete Collection" বোতামের জন্য */}
+          <Route path="/all-products" element={<AllProductsPage />} />
+          
           <Route path="/category/:id" element={<CategoryPage />} />
           <Route path="/product/:id" element={<ProductPage />} />
 
