@@ -1,0 +1,12 @@
+const express = require("express");
+const router = express.Router();
+const { addOrderItems, getOrders } = require("../controllers/orderController");
+const { protect, admin } = require("../middleware/authMiddleware"); // অথেন্টিকেশন মিডলওয়্যার
+
+// ১. অর্ডার তৈরি (লগইন করা ইউজার পারবে)
+router.route("/").post(protect, addOrderItems);
+
+// ২. সব অর্ডার দেখা (শুধুমাত্র অ্যাডমিন পারবে)
+router.route("/").get(protect, admin, getOrders);
+
+module.exports = router;

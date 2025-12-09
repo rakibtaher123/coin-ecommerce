@@ -1,0 +1,98 @@
+/* সম্পূর্ণ পেজের ব্যাকগ্রাউন্ড */
+.eshop-container {
+  background-color: #eaf6fc; /* হালকা নীল ব্যাকগ্রাউন্ড */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  font-family: 'Arial', sans-serif;
+}
+
+/* শিরোনামের স্টাইল */
+.page-title {
+  color: #1b4d2e; /* গাঢ় সবুজ */
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+}
+
+/* সাদা বক্সটি */
+.category-card {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 900px;
+  text-align: center;
+}
+
+/* সাব-টাইটেল */
+.card-subtitle {
+  color: #1b4d2e;
+  font-size: 18px;
+  margin-bottom: 20px;
+  text-align: left;
+  padding-left: 10px;
+}
+
+/* গ্রিড লেআউট (দুই কলাম) */
+.category-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* দুই কলাম */
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+/* প্রতিটি ক্যাটাগরি বাটন */
+.category-item {
+  background-color: #ecf7ed; /* হালকা সবুজ ব্যাকগ্রাউন্ড */
+  color: #2e5e38;
+  padding: 15px 20px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: 1px solid #dceddf;
+}
+
+.category-item:hover {
+  background-color: #dbece0;
+}
+
+/* অ্যারো আইকন */
+.arrow-icon {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* View All বাটন */
+.view-all-btn {
+  background-color: #1b4d2e; /* গাঢ় সবুজ */
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 15px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background-color 0.3s;
+}
+
+.view-all-btn:hover {
+  background-color: #143a22;
+}
+
+/* রেস্পন্সিভ (মোবাইলের জন্য) */
+@media (max-width: 600px) {
+  .category-grid {
+    grid-template-columns: 1fr; /* মোবাইলে ১ কলাম হবে */
+  }
+}
