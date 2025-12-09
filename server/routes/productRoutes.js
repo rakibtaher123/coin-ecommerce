@@ -2,6 +2,11 @@ const express = require('express');
 const router = express.Router();
 const Product = require('../models/Product');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
+
+// ১. আপলোড মিডলওয়্যার ইমপোর্ট (আগের ধাপে বানানো ফাইলটি)
+const upload = require('../middleware/upload'); 
 
 // 🔐 Middleware: Admin check
 const verifyAdmin = (req, res, next) => {
@@ -45,16 +50,32 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// ✅ POST: নতুন প্রোডাক্ট যোগ করা (admin only)
-router.post('/', verifyAdmin, async (req, res) => {
+// ✅ POST: নতুন প্রোডাক্ট যোগ করা (With Image Upload)
+// upload.single('image') এখানে ফাইল রিসিভ করবে
+router.post('/', verifyAdmin, upload.single('image'), async (req, res) => {
   try {
-    const { name, category, price, description, image, stock } = req.body;
+    const { name, category, price, description, stock } = req.body;
 
-    if (!name || !category || !price || !description || !image || !stock) {
-      return res.status(400).json({ error: "All fields are required" });
+    // ইমেজ হ্যান্ডলিং: ফাইল থাকলে পাথে '/assets/filename', না থাকলে ইউজার ইনপুট (URL)
+    let imagePath = req.body.image || ""; 
+    if (req.file) {
+        imagePath = `/assets/${req.file.filename}`;
     }
 
-    const newProduct = new Product({ name, category, price, description, image, stock });
+    // ভ্যালিডেশন (স্টক বাদে বাকিগুলো চেক করা হলো, স্টক অপশনাল হতে পারে)
+    if (!name || !category || !price) {
+      return res.status(400).json({ error: "Name, Category and Price are required" });
+    }
+
+    const newProduct = new Product({ 
+        name, 
+        category, 
+        price, 
+        description, 
+        image: imagePath, 
+        stock: stock || 0 // স্টক না দিলে ০
+    });
+    
     await newProduct.save();
 
     res.status(201).json({
@@ -68,11 +89,19 @@ router.post('/', verifyAdmin, async (req, res) => {
 });
 
 // ✅ PUT: প্রোডাক্ট আপডেট করা (admin only)
-router.put('/:id', verifyAdmin, async (req, res) => {
+router.put('/:id', verifyAdmin, upload.single('image'), async (req, res) => {
   try {
+    const productId = req.params.id;
+    let updateData = { ...req.body };
+
+    // যদি নতুন ছবি আপলোড হয়, তবে সেটা আপডেট হবে
+    if (req.file) {
+        updateData.image = `/assets/${req.file.filename}`;
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
+      productId,
+      updateData,
       { new: true, runValidators: true }
     );
 
@@ -90,16 +119,26 @@ router.put('/:id', verifyAdmin, async (req, res) => {
   }
 });
 
-// ✅ DELETE: প্রোডাক্ট ডিলিট করা (admin only)
+// ✅ DELETE: প্রোডাক্ট ডিলিট করা (সাথে ছবিও ডিলিট হবে)
 router.delete('/:id', verifyAdmin, async (req, res) => {
   try {
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
 
-    if (!deletedProduct) {
+    if (!product) {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    res.status(200).json({ message: "✅ Deleted Successfully" });
+    // সার্ভার ফোল্ডার থেকে ছবি ডিলিট করা (যদি লোকাল ফাইল হয়)
+    if (product.image && product.image.startsWith('/assets/')) {
+        const filePath = path.join(__dirname, '../public', product.image); // public/assets ফোল্ডার পাথ
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath); // ফাইল ডিলিট
+        }
+    }
+
+    await Product.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: "✅ Product and Image Deleted Successfully" });
   } catch (err) {
     console.error("Error deleting product:", err);
     res.status(500).json({ error: "Failed to delete product" });

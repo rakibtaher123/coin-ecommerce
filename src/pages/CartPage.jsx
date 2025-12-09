@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Box, Container, Typography, Button, Paper, IconButton, Table, TableBody,
-  TableCell, TableContainer, TableHead, TableRow, Divider, Grid, TextField
+  TableCell, TableContainer, TableHead, TableRow, Divider, Grid, TextField, CircularProgress
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
@@ -9,17 +9,91 @@ import { useCart } from '../context/CartProvider';
 
 const CartPage = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // লোডিং স্টেট
   
-  // ✅ SAFETY FIX: Default to empty array [] if cartItems is undefined
-  const { cartItems = [], totalPrice, removeFromCart } = useCart();
+  // ✅ useCart থেকে clearCart ফাংশনটি আনা হয়েছে (যদি তোমার Context-এ থাকে)
+  const { cartItems = [], totalPrice, removeFromCart, clearCart } = useCart();
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://via.placeholder.com/150';
     return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
   };
 
-  const handleCheckoutClick = () => {
-    navigate('/checkout');
+  // ✅ নতুন হ্যান্ডলার: এটি সরাসরি ডাটাবেসে অর্ডার পাঠাবে
+  const handleCheckoutClick = async () => {
+    // ১. লগইন চেক
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert("Please login first to place an order!");
+      navigate('/login');
+      return;
+    }
+
+    if (cartItems.length === 0) {
+        alert("Your cart is empty!");
+        return;
+    }
+
+    // ২. কনফার্মেশন
+    const confirmOrder = window.confirm("Are you sure you want to place this order via Cash on Delivery?");
+    if (!confirmOrder) return;
+
+    setLoading(true);
+
+    // ৩. অর্ডারের ডাটা প্রস্তুত করা
+    // (যেহেতু আলাদা চেকআউট পেজ নেই, তাই আমরা ডিফল্ট এড্রেস দিচ্ছি যাতে অর্ডার সেভ হয়)
+    const orderData = {
+        orderItems: cartItems.map(item => ({
+            name: item.name,
+            qty: item.qty,
+            image: item.image,
+            price: item.price,
+            product: item._id
+        })),
+        shippingAddress: {
+            address: "Dhaka, Bangladesh",
+            city: "Dhaka",
+            postalCode: "1200",
+            country: "Bangladesh"
+        },
+        paymentMethod: "Cash On Delivery", // ডিফল্ট পেমেন্ট মেথড
+        itemsPrice: totalPrice,
+        taxPrice: 0,
+        shippingPrice: 60, // শিপিং চার্জ (চাইলে বদলাতে পারো)
+        totalPrice: totalPrice + 60 
+    };
+
+    try {
+        const response = await fetch('http://localhost:5000/api/orders', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // টোকেন পাঠানো হচ্ছে
+            },
+            body: JSON.stringify(orderData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("✅ Order Placed Successfully!");
+            
+            // কার্ট খালি করা (যদি ফাংশনটি থাকে)
+            if (clearCart) clearCart(); 
+            else window.location.reload(); // অথবা পেজ রিলোড
+
+            // অর্ডার লিস্ট পেজে নিয়ে যাওয়া (যদি থাকে) বা হোম পেজে
+            navigate('/profile'); // অথবা '/'
+        } else {
+            alert("Order Failed: " + (data.message || "Unknown Error"));
+        }
+
+    } catch (error) {
+        console.error("Order Error:", error);
+        alert("Server Error! Check console.");
+    } finally {
+        setLoading(false);
+    }
   };
 
   // Handle empty or loading state safely
@@ -100,13 +174,27 @@ const CartPage = () => {
                 <Typography color="text.secondary">Subtotal</Typography>
                 <Typography fontWeight="bold">৳{totalPrice.toLocaleString()}</Typography>
               </Box>
+              
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Typography color="text.secondary">Shipping</Typography>
+                <Typography fontWeight="bold">৳60</Typography>
+              </Box>
+
               <Divider sx={{ my: 2 }} />
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
                 <Typography variant="h6" fontWeight="bold">Total</Typography>
-                <Typography variant="h5" fontWeight="bold" color="#1b5e20">৳{totalPrice.toLocaleString()}</Typography>
+                <Typography variant="h5" fontWeight="bold" color="#1b5e20">৳{(totalPrice + 60).toLocaleString()}</Typography>
               </Box>
-              <Button variant="contained" size="large" fullWidth onClick={handleCheckoutClick} sx={{ bgcolor: '#1b5e20', py: 1.5, '&:hover': { bgcolor: '#004d40' } }}>
-                PROCEED TO CHECKOUT
+              
+              <Button 
+                variant="contained" 
+                size="large" 
+                fullWidth 
+                onClick={handleCheckoutClick} 
+                disabled={loading}
+                sx={{ bgcolor: '#1b5e20', py: 1.5, '&:hover': { bgcolor: '#004d40' } }}
+              >
+                {loading ? <CircularProgress size={24} color="inherit" /> : "PLACE ORDER"}
               </Button>
             </Paper>
           </Grid>

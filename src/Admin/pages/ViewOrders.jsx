@@ -1,172 +1,141 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { 
+  Box, Typography, Table, TableBody, TableCell, TableContainer, 
+  TableHead, TableRow, Paper, Select, MenuItem, Button, Chip, CircularProgress 
+} from '@mui/material';
 
 const ViewOrders = () => {
   const [orders, setOrders] = useState([]);
-  const [selectedCourier, setSelectedCourier] = useState({});
-  const [loading, setLoading] = useState(true);   // লোডিং স্টেট
-  const [error, setError] = useState(null);       // এরর স্টেট
+  const [loading, setLoading] = useState(true);
 
-  // 📦 অর্ডার লোড করা (API থেকে)
-  const loadOrders = async () => {
+  // ১. অর্ডার লোড করা
+  const fetchOrders = async () => {
     try {
-      setLoading(true);
-      const response = await fetch('http://localhost:5000/orders');
-      if (!response.ok) throw new Error("Failed to fetch orders");
+      const token = localStorage.getItem('token');
+      // তোমার ব্যাকএন্ড রাউট অনুযায়ী লিংক চেক করো। সাধারণত অ্যাডমিনের জন্য সব অর্ডার দেখার লিংক ভিন্ন হতে পারে।
+      // যদি '/api/orders' এ সব অর্ডার আসে তবে এটাই ঠিক আছে।
+      const response = await fetch('http://localhost:5000/api/orders', { 
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const data = await response.json();
-      setOrders(data);
+      
+      // যদি ডাটা অ্যারে হয় তবেই সেট করবে
+      if (Array.isArray(data)) {
+        setOrders(data);
+      } else if (data.orders) {
+        setOrders(data.orders);
+      }
     } catch (error) {
-      setError(error.message);
+      console.error("Error fetching orders:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadOrders();
+    fetchOrders();
   }, []);
 
-  // 🚚 স্ট্যাটাস আপডেট করা
-  const updateStatus = async (id, newStatus) => {
-    let courierName = "";
-
-    if (newStatus === 'Shipped') {
-      courierName = selectedCourier[id];
-      if (!courierName) {
-        console.log("⚠️ Please select a Courier Service first! (Redx/Pathao/etc)");
-        return;
-      }
-    }
-
+  // ২. স্ট্যাটাস আপডেট হ্যান্ডলার
+  const handleStatusChange = async (id, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/orders/${id}`, {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/orders/${id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus, courier: courierName }),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ status: newStatus })
       });
 
       if (response.ok) {
-        console.log(`✅ Order marked as ${newStatus}`);
-        loadOrders();
+        alert("Status Updated!");
+        fetchOrders(); // লিস্ট রিফ্রেশ
       } else {
-        console.log("❌ Failed to update order status");
+        alert("Failed to update status");
       }
     } catch (error) {
-      console.error("Update failed:", error);
+      console.error("Update error:", error);
     }
   };
 
-  // 🗑️ অর্ডার ডিলিট
-  const deleteOrder = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this order?")) return;
-
-    try {
-      const response = await fetch(`http://localhost:5000/orders/${id}`, { method: 'DELETE' });
-      if (response.ok) {
-        console.log("🗑 Order Deleted!");
-        loadOrders();
-      } else {
-        console.log("❌ Failed to delete order");
-      }
-    } catch (error) {
-      console.error("Delete failed:", error);
-    }
-  };
-
-  // কুরিয়ার সিলেক্ট করলে স্টেট আপডেট
-  const handleCourierChange = (orderId, value) => {
-    setSelectedCourier({ ...selectedCourier, [orderId]: value });
-  };
+  // লোডিং স্টেট
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
-    <div style={{ padding: '30px', backgroundColor: '#f3f4f6', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
-      
-      {/* হেডার */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '3px solid #166534', paddingBottom: '10px' }}>
-        <h2 style={{ color: '#166534', margin: 0 }}>📦 Manage Customer Orders</h2>
-        <span style={{ backgroundColor: '#166534', color: 'white', padding: '5px 15px', borderRadius: '20px', fontSize: '14px' }}>
-          Total Orders: {orders.length}
-        </span>
-      </div>
+    <Box sx={{ p: 4, bgcolor: '#f4f6f8', minHeight: '100vh' }}>
+      <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold', color: '#1e293b' }}>
+        Manage Orders 📦
+      </Typography>
 
-      {/* লোডিং / এরর */}
-      {loading && <p style={{ textAlign: 'center' }}>⏳ Loading orders...</p>}
-      {error && <p style={{ textAlign: 'center', color: 'red' }}>❌ {error}</p>}
-
-      {/* অর্ডার লিস্ট */}
-      {!loading && orders.length === 0 ? (
-        <div style={{ textAlign: 'center', marginTop: '50px', color: '#666' }}>
-          <h3>No orders found yet.</h3>
-          <p>Wait for customers to place orders.</p>
-        </div>
+      {orders.length === 0 ? (
+        <Typography variant="h6" color="text.secondary">No orders found.</Typography>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {orders.map((order) => (
-            <div key={order._id} style={{ backgroundColor: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', borderLeft: `5px solid ${order.status === 'Pending' ? 'orange' : order.status === 'Shipped' ? 'blue' : 'green'}` }}>
-              
-              {/* কাস্টমার ও পেমেন্ট ইনফো */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', paddingBottom: '15px' }}>
-                <div>
-                  <span style={{ fontSize: '11px', color: '#999', textTransform: 'uppercase' }}>Order ID: {order._id}</span>
-                  <h3 style={{ margin: '5px 0', color: '#111827' }}>👤 {order.customerName}</h3>
-                  <p style={{ margin: '2px 0', color: '#4b5563', fontSize: '14px' }}>📞 {order.mobile}</p>
-                  <p style={{ margin: '2px 0', color: '#4b5563', fontSize: '14px' }}>📍 {order.address}</p>
-                </div>
-
-                <div style={{ textAlign: 'right' }}>
-                   <div style={{ marginBottom: '5px' }}>
-                      <span style={{ fontSize: '14px', color: '#555' }}>Payment: </span> 
-                      <span style={{ backgroundColor: '#eff6ff', color: '#1d4ed8', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', fontSize: '14px' }}>
-                        {order.paymentMethod}
-                      </span>
-                   </div>
-                   
-                   {order.transactionId && (
-                     <div style={{ fontSize: '13px', color: '#059669', fontWeight: 'bold', marginBottom: '5px', backgroundColor: '#ecfdf5', padding: '2px 5px', display: 'inline-block' }}>
-                       TrxID: {order.transactionId}
-                     </div>
-                   )}
-
-                   <h2 style={{ color: '#d97706', margin: '5px 0' }}>৳ {order.totalPrice}</h2>
-                </div>
-              </div>
-
-              {/* অ্যাকশন ও কুরিয়ার */}
-              <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
-                
-                {/* বর্তমান স্ট্যাটাস */}
-                <div>
-                   <span style={{ fontWeight: 'bold', color: '#555' }}>Current Status: </span> 
-                   <span style={{ 
-                     backgroundColor: order.status === 'Pending' ? '#fff7ed' : (order.status === 'Shipped' ? '#eff6ff' : '#f0fdf4'), 
-                     color: order.status === 'Pending' ? '#c2410c' : (order.status === 'Shipped' ? '#1d4ed8' : '#15803d'), 
-                     padding: '6px 15px', borderRadius: '20px', fontWeight: 'bold', border: '1px solid #ddd'
-                   }}>
-                     {order.status}
-                   </span>
-                   
-                   {order.courier && (
-                     <span style={{ marginLeft: '10px', fontSize: '14px', color: '#4b5563', backgroundColor: '#f3f4f6', padding: '5px 10px', borderRadius: '5px' }}>
-                       via 🚚 <strong>{order.courier}</strong>
-                     </span>
-                   )}
-                </div>
-
-                {/* অ্যাকশন বাটনস */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 2 }}>
+          <Table>
+            <TableHead sx={{ bgcolor: '#334155' }}>
+              <TableRow>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Order ID</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Customer</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Date</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Total</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Payment</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Status</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {orders.map((order) => (
+                <TableRow key={order._id} hover>
+                  <TableCell sx={{ fontFamily: 'monospace' }}>#{order._id.slice(-6)}</TableCell>
                   
-                  {order.status === 'Pending' && (
-                    <>
-                      <select 
-                        onChange={(e) => handleCourierChange(order._id, e.target.value)}
-                        style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc', cursor: 'pointer', outline: 'none' }}
-                      >
-                        <option value="">Select Courier...</option>
-                        <option value="Redx">Redx</option>
-                        <option value="Pathao">Pathao</option>
-                        <option value="Sundarban">Sundarban</option>
-                        <option value="SA Paribahan">SA Paribahan</option>
-                      </select>
+                  {/* ইউজার নেম হ্যান্ডলিং (যদি ইউজার ডিলিট হয়ে যায়) */}
+                  <TableCell>{order.user?.name || "Guest / Deleted User"}</TableCell>
+                  
+                  <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>৳{order.totalPrice}</TableCell>
+                  <TableCell>{order.paymentMethod}</TableCell>
+                  
+                  <TableCell>
+                    <Chip 
+                      label={order.status} 
+                      color={
+                        order.status === 'Delivered' ? 'success' : 
+                        order.status === 'Pending' ? 'warning' : 'default'
+                      }
+                      size="small"
+                    />
+                  </TableCell>
 
-                      <button 
-                        onClick={() => updateStatus(order._id, 'Shipped')} 
-                        style={{ backgroundColor: '#2563eb', color:
+                  <TableCell>
+                    <Select
+                      size="small"
+                      value={order.status}
+                      onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                      sx={{ fontSize: '12px', minWidth: 120, bgcolor: 'white' }}
+                    >
+                      <MenuItem value="Pending">Pending</MenuItem>
+                      <MenuItem value="Processing">Processing</MenuItem>
+                      <MenuItem value="Shipped">Shipped</MenuItem>
+                      <MenuItem value="Delivered">Delivered</MenuItem>
+                      <MenuItem value="Cancelled">Cancelled</MenuItem>
+                    </Select>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </Box>
+  );
+};
+
+export default ViewOrders;

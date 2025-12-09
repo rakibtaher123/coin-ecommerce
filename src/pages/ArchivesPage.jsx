@@ -17,9 +17,9 @@ const ArchivesPage = () => {
 
   // ✅ ইমেজ ফিক্সার ফাংশন
   const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/assets/logos/coin_hero.jpg";
-    if (imagePath.startsWith("http")) return imagePath;
-    return `${API_BASE_URL}${imagePath}`;
+    if (!imagePath) return "/assets/logos/coin_hero.jpg"; // ডিফল্ট ছবি
+    if (imagePath.startsWith("http")) return imagePath;   // অনলাইন লিংক
+    return `${API_BASE_URL}${imagePath}`;               // লোকাল পাথ
   };
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const ArchivesPage = () => {
       } catch (error) {
         console.log("Loading realistic dummy archives data...");
         
-        // ২. রিয়েলিস্টিক ডামি ডাটা (আপনার ইমেজের মতো)
+        // ২. রিয়েলিস্টিক ডামি ডাটা (যাতে পেজ সুন্দর দেখায়)
         setArchives([
           {
             _id: 101,
@@ -110,7 +110,7 @@ const ArchivesPage = () => {
         py: 8, 
         textAlign: 'center', 
         mb: 6,
-        backgroundImage: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("/assets/logos/coin_hero.jpg")', // রিয়েলিস্টিক হিরো ইমেজ
+        backgroundImage: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("/assets/logos/coin_hero.jpg")', 
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         boxShadow: '0 4px 20px rgba(0,0,0,0.4)'
@@ -182,6 +182,7 @@ const ArchivesPage = () => {
 
                     <Divider sx={{ my: 1.5 }} />
 
+                    {/* Price Information */}
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2, color: '#1b5e20', bgcolor: '#e8f5e9', p: 1, borderRadius: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <MonetizationOnIcon fontSize="small" />
@@ -190,6 +191,7 @@ const ArchivesPage = () => {
                       <Typography variant="body1" fontWeight="bold">৳ {item.highestBid.toLocaleString()}</Typography>
                     </Box>
 
+                    {/* Winner Information */}
                     {item.winner && (
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                         <EmojiEventsIcon fontSize="small" color="warning" />
@@ -199,6 +201,7 @@ const ArchivesPage = () => {
                       </Box>
                     )}
 
+                    {/* Date Information */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
                       <EventIcon fontSize="small" />
                       <Typography variant="caption">

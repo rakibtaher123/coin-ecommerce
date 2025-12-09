@@ -21,39 +21,32 @@ const Dashboard = () => {
   });
   
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // Error state added
+  const [error, setError] = useState(null); 
 
   // 🔐 Security & Data Fetching
   useEffect(() => {
     const token = localStorage.getItem("token");
-    // const user = JSON.parse(localStorage.getItem("user"));
-
-    // Optional: Security Check
-    // if (!token || user?.role !== 'admin') {
-    //   navigate("/login"); 
-    // }
-
+    
     // Load Stats
     fetchDashboardStats(token);
   }, [navigate]);
 
   const fetchDashboardStats = async (token) => {
     try {
-      // Replace with your actual backend endpoint
+      // Backend Endpoint Call
       const response = await fetch("http://localhost:5000/api/dashboard-stats", {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       if (response.ok) {
         const data = await response.json();
-        setStats(data);
+        setStats(data); // ডাটা স্টেটে সেট করা হলো
       } else {
         throw new Error("Failed to fetch dashboard stats");
       }
     } catch (err) {
       console.error("Error loading stats:", err);
-      // setError("Could not load dashboard data. Please check backend connection.");
-      // For now, we keep stats as 0 instead of showing a big error
+      // এরর হলেও আমরা লোডিং বন্ধ করব যাতে UI হ্যাং না করে
     } finally {
       setLoading(false);
     }
@@ -200,12 +193,12 @@ const Dashboard = () => {
                 />
               </Grid>
 
-              {/* 🔥 Manage Auctions Button (Red Color) */}
+              {/* 🔥 Manage Auctions Button */}
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton 
                   title="Manage Auctions" 
                   icon={<Gavel />} 
-                  color="#d32f2f" // Red (Highlight)
+                  color="#d32f2f" // Red
                   path="/admin/auctions"
                 />
               </Grid>

@@ -1,144 +1,190 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import ProductForm from '../components/ProductForm';
+import { 
+  Box, TextField, Button, Typography, Paper, Grid, Table, 
+  TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton, Avatar 
+} from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);   // লোডিং স্টেট
-  const [error, setError] = useState(null);       // এরর স্টেট
-  const navigate = useNavigate();
+  
+  // ফর্ম স্টেট
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+  const [price, setPrice] = useState('');
+  const [imageFile, setImageFile] = useState(null); // ফাইলের জন্য স্টেট
+  const [preview, setPreview] = useState(''); // প্রিভিউ দেখানোর জন্য
 
-  // 🔐 সিকিউরিটি গার্ড (লগইন চেক)
-  useEffect(() => {
-    const isAdmin = localStorage.getItem("isAdminLoggedIn");
-    if (!isAdmin) {
-      navigate("/login");
-    }
-  }, [navigate]);
-
-  // 📦 প্রোডাক্ট লোড করার ফাংশন
-  const loadProducts = async () => {
+  // প্রোডাক্ট লোড করা
+  const fetchProducts = async () => {
     try {
-      setLoading(true);
-      const response = await fetch('http://localhost:5000/products');
-      if (!response.ok) throw new Error("Failed to fetch products");
-      const data = await response.json();
+      const res = await fetch('http://localhost:5000/api/products');
+      const data = await res.json();
       setProducts(data);
     } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
+      console.error("Error fetching products:", error);
     }
   };
 
-  // পেজ লোড হওয়ার সাথে সাথে প্রোডাক্ট আনবে
   useEffect(() => {
-    loadProducts();
+    fetchProducts();
   }, []);
 
-  // ➕ প্রোডাক্ট যোগ করার ফাংশন
-  const addProduct = async (productData) => {
+  // ফাইল সিলেক্ট হ্যান্ডলার
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+    if (file) {
+        setPreview(URL.createObjectURL(file)); // প্রিভিউ সেট করা
+    }
+  };
+
+  // সাবমিট হ্যান্ডলার (FormData ব্যবহার করে)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // FormData অবজেক্ট তৈরি (ফাইল পাঠানোর জন্য এটি জরুরি)
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('category', category);
+    formData.append('price', price);
+    if (imageFile) {
+        formData.append('image', imageFile); // 'image' নামটা ব্যাকএন্ডের সাথে মিলতে হবে
+    }
+
     try {
-      const response = await fetch('http://localhost:5000/products', {
+      const response = await fetch('http://localhost:5000/api/products', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
+        // headers এ 'Content-Type' দেওয়া যাবে না, ব্রাউজার অটো সেট করবে
+        body: formData, 
       });
 
       if (response.ok) {
-        console.log('✅ Product Added Successfully!');
-        loadProducts();
+        alert("Product Added Successfully!");
+        // ফর্ম রিসেট
+        setName('');
+        setCategory('');
+        setPrice('');
+        setImageFile(null);
+        setPreview('');
+        fetchProducts(); // লিস্ট রিফ্রেশ
       } else {
-        console.log('❌ Failed to add product');
+        alert("Failed to add product");
       }
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error(error);
     }
   };
 
-  // 🗑️ প্রোডাক্ট ডিলিট করার ফাংশন
-  const deleteProduct = async (id) => {
+  // ডিলিট হ্যান্ডলার
+  const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/products/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        console.log('🗑️ Product Deleted!');
-        setProducts(products.filter((p) => p._id !== id));
-      } else {
-        console.log('❌ Failed to delete product');
+        alert("Product Deleted!");
+        fetchProducts(); // লিস্ট থেকে সরিয়ে দেওয়া
       }
     } catch (error) {
       console.error("Error deleting product:", error);
     }
   };
 
-  // 🚪 লগআউট বাটন
-  const handleLogout = () => {
-    localStorage.removeItem("isAdminLoggedIn");
-    console.log("Logged out successfully!");
-    navigate("/login");
-  };
-
   return (
-    <div className="admin-container" style={{ padding: '20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>🛒 Manage Products</h2>
-        <button 
-          onClick={handleLogout} 
-          style={{ backgroundColor: '#333', color: 'white', padding: '8px 15px', border: 'none', cursor: 'pointer' }}
-        >
-          Logout
-        </button>
-      </div>
+    <Box sx={{ p: 4, bgcolor: '#f4f6f8', minHeight: '100vh' }}>
+      <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>Manage Products</Typography>
 
-      {/* ফর্ম */}
-      <div style={{ marginBottom: '30px', marginTop: '20px' }}>
-        <ProductForm onSubmit={addProduct} />
-      </div>
+      <Grid container spacing={4}>
+        {/* বাম পাশ: প্রোডাক্ট অ্যাড করার ফর্ম */}
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>Add New Product</Typography>
+            <form onSubmit={handleSubmit}>
+              <TextField 
+                fullWidth label="Product Name" variant="outlined" margin="normal" 
+                value={name} onChange={(e) => setName(e.target.value)} required 
+              />
+              <TextField 
+                fullWidth label="Category" variant="outlined" margin="normal" 
+                value={category} onChange={(e) => setCategory(e.target.value)} required 
+              />
+              <TextField 
+                fullWidth label="Price (Tk)" type="number" variant="outlined" margin="normal" 
+                value={price} onChange={(e) => setPrice(e.target.value)} required 
+              />
+              
+              {/* ইমেজ আপলোড বাটন */}
+              <Box sx={{ mt: 2, mb: 2, border: '1px dashed #ccc', p: 2, textAlign: 'center' }}>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="raised-button-file"
+                  type="file"
+                  onChange={handleFileChange}
+                />
+                <label htmlFor="raised-button-file">
+                  <Button variant="outlined" component="span" startIcon={<CloudUploadIcon />}>
+                    Upload Image
+                  </Button>
+                </label>
+                {preview && (
+                    <Box mt={2}>
+                        <img src={preview} alt="Preview" style={{ width: '100px', borderRadius: '8px' }} />
+                    </Box>
+                )}
+              </Box>
 
-      {/* লোডিং / এরর হ্যান্ডলিং */}
-      {loading && <p>⏳ Loading products...</p>}
-      {error && <p style={{ color: 'red' }}>❌ {error}</p>}
+              <Button type="submit" variant="contained" fullWidth color="success" size="large">
+                Save Product
+              </Button>
+            </form>
+          </Paper>
+        </Grid>
 
-      {/* প্রোডাক্ট টেবিল */}
-      {!loading && products.length > 0 ? (
-        <table border="1" cellPadding="10" style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f2f2f2' }}>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Stock</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product) => (
-              <tr key={product._id}>
-                <td>{product.name}</td>
-                <td>{product.category}</td>
-                <td>{product.price} Tk</td>
-                <td>{product.stock}</td>
-                <td>
-                  <button 
-                    onClick={() => deleteProduct(product._id)} 
-                    style={{ backgroundColor: 'red', color: 'white', border: 'none', padding: '5px 10px', cursor: 'pointer' }}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        !loading && <p>No products found.</p>
-      )}
-    </div>
+        {/* ডান পাশ: প্রোডাক্ট লিস্ট এবং ডিলিট বাটন */}
+        <Grid item xs={12} md={8}>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead sx={{ bgcolor: '#eee' }}>
+                <TableRow>
+                  <TableCell>Image</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Category</TableCell>
+                  <TableCell>Price</TableCell>
+                  <TableCell>Action</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {products.map((product) => (
+                  <TableRow key={product._id}>
+                    <TableCell>
+                      <Avatar 
+                        src={`http://localhost:5000${product.image}`} 
+                        variant="rounded" 
+                        sx={{ width: 50, height: 50 }}
+                      />
+                    </TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>{product.category}</TableCell>
+                    <TableCell>৳{product.price}</TableCell>
+                    <TableCell>
+                      <IconButton color="error" onClick={() => handleDelete(product._id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

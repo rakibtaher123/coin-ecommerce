@@ -24,13 +24,19 @@ import LiveAuctionPage from './pages/LiveAuctionPage';
 import ArchivesPage from './pages/ArchivesPage';
 import ClientPanel from './pages/ClientPanel';
 
-// ✅ অ্যাডমিন পেজ ইম্পোর্ট (সঠিক পাথ ব্যবহার করা হয়েছে)
-// আমরা 'Dashboard.jsx' ব্যবহার করছি কারণ সেখানেই 'Manage Auctions' বাটনটি আছে
+// ✅ অ্যাডমিন পেজ ইম্পোর্ট (নতুন পেজগুলো যুক্ত করা হয়েছে)
 import AdminDashboard from './Admin/pages/Dashboard'; 
+import AdminLogin from './Admin/pages/AdminLogin';
+
+// 🔥 MISSING IMPORTS ADDED HERE
 import ManageAuctions from './Admin/pages/ManageAuctions';
 import LiveBiddingMonitor from './Admin/pages/LiveBiddingMonitor';
 import AuctionHistory from './Admin/pages/AuctionHistory';
-import AdminLogin from './Admin/pages/AdminLogin'; // যদি আলাদা অ্যাডমিন লগইন থাকে
+import ManageProducts from './Admin/pages/ManageProducts'; // নতুন
+import ViewOrders from './Admin/pages/ViewOrders';         // নতুন
+import ManageUsers from './Admin/pages/ManageUsers';       // নতুন
+import SiteSettings from './Admin/pages/SiteSettings';     // নতুন
+import FeedbackPage from './Admin/pages/FeedbackPage';     // নতুন (ফাইলের নাম চেক করে নিও FeedbackPage.jsx নাকি ViewFeedback.jsx)
 
 function App() {
     const location = useLocation();
@@ -70,18 +76,24 @@ function App() {
                     <Route path="/client" element={<ClientPanel />} />
 
                     {/* ✅ অ্যাডমিন প্যানেল রাউটস (Admin Only) */}
-                    {/* মেইন ড্যাশবোর্ড */}
-                    <Route path="/admin" element={<AdminDashboard />} /> 
                     
-                    {/* আলাদা অ্যাডমিন লগইন পেইজ (অপশনাল) */}
+                    {/* ১. ড্যাশবোর্ড */}
+                    <Route path="/admin" element={<AdminDashboard />} /> 
                     <Route path="/admin/login" element={<AdminLogin />} />
 
-                    {/* অকশন ম্যানেজমেন্ট রাউটস */}
+                    {/* ২. এই রাউটগুলো মিসিং ছিল, তাই বাটন কাজ করত না */}
+                    <Route path="/admin/products" element={<ManageProducts />} />
+                    <Route path="/admin/orders" element={<ViewOrders />} />
+                    <Route path="/admin/users" element={<ManageUsers />} />
+                    <Route path="/admin/settings" element={<SiteSettings />} />
+                    <Route path="/admin/feedback" element={<FeedbackPage />} />
+
+                    {/* ৩. অকশন ম্যানেজমেন্ট রাউটস */}
                     <Route path="/admin/auctions" element={<ManageAuctions />} />
                     <Route path="/admin/auctions/live/:id" element={<LiveBiddingMonitor />} />
                     <Route path="/admin/auctions/history" element={<AuctionHistory />} />
 
-                    {/* Fallback Route (ভুল লিংকে গেলে হোমপেজে পাঠাবে) */}
+                    {/* Fallback Route */}
                     <Route path="*" element={<HomePage />} />
                 </Routes>
             </div>
