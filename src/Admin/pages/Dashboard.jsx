@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Box, Grid, Paper, Typography, Button, Container, CircularProgress, Card, CardContent 
+  Box, Grid, Paper, Typography, Button, Container, CircularProgress, Card, CardContent, Alert 
 } from '@mui/material';
 import { 
   Inventory, ShoppingCart, People, AttachMoney, 
@@ -21,24 +21,25 @@ const Dashboard = () => {
   });
   
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null); // Error state added
 
   // 🔐 Security & Data Fetching
   useEffect(() => {
     const token = localStorage.getItem("token");
     // const user = JSON.parse(localStorage.getItem("user"));
 
-    // সিকিউরিটি চেক (Optional: আনকমেন্ট করতে পারেন)
+    // Optional: Security Check
     // if (!token || user?.role !== 'admin') {
     //   navigate("/login"); 
     // }
 
-    // Stats লোড করা
+    // Load Stats
     fetchDashboardStats(token);
   }, [navigate]);
 
   const fetchDashboardStats = async (token) => {
     try {
-      // আপনার ব্যাকএন্ড API এন্ডপয়েন্ট
+      // Replace with your actual backend endpoint
       const response = await fetch("http://localhost:5000/api/dashboard-stats", {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -46,9 +47,13 @@ const Dashboard = () => {
       if (response.ok) {
         const data = await response.json();
         setStats(data);
+      } else {
+        throw new Error("Failed to fetch dashboard stats");
       }
-    } catch (error) {
-      console.error("Error loading stats:", error);
+    } catch (err) {
+      console.error("Error loading stats:", err);
+      // setError("Could not load dashboard data. Please check backend connection.");
+      // For now, we keep stats as 0 instead of showing a big error
     } finally {
       setLoading(false);
     }
@@ -131,6 +136,8 @@ const Dashboard = () => {
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
             <CircularProgress size={60} color="success" />
           </Box>
+        ) : error ? (
+          <Alert severity="error" sx={{ mb: 4 }}>{error}</Alert>
         ) : (
           <>
             {/* --- Stats Overview Section --- */}
@@ -193,7 +200,7 @@ const Dashboard = () => {
                 />
               </Grid>
 
-              {/* 🔥 Manage Auctions Button Added (Red Color) */}
+              {/* 🔥 Manage Auctions Button (Red Color) */}
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton 
                   title="Manage Auctions" 
