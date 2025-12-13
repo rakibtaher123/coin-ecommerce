@@ -23,9 +23,12 @@ import NotificationsPage from './pages/NotificationsPage';
 import LiveAuctionPage from './pages/LiveAuctionPage';
 import ArchivesPage from './pages/ArchivesPage';
 import ClientPanel from './pages/ClientPanel';
+import PaymentPage from './pages/PaymentPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import PaymentFailedPage from './pages/PaymentFailedPage';
 
 // ✅ অ্যাডমিন পেজ ইম্পোর্ট (নতুন পেজগুলো যুক্ত করা হয়েছে)
-import AdminDashboard from './Admin/pages/Dashboard'; 
+import AdminDashboard from './Admin/pages/Dashboard';
 import AdminLogin from './Admin/pages/AdminLogin';
 
 // 🔥 MISSING IMPORTS ADDED HERE
@@ -41,12 +44,12 @@ import FeedbackPage from './Admin/pages/FeedbackPage';     // নতুন (ফ�
 function App() {
     const location = useLocation();
 
-    // 🛑 যদি URL '/admin' দিয়ে শুরু হয়, তাহলে Navbar ও Footer দেখাবে না
-    const isAdminRoute = location.pathname.startsWith('/admin');
+    // 🛑 যদি URL '/admin' বা '/client' দিয়ে শুরু হয়, তাহলে Navbar ও Footer দেখাবে না
+    const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/client');
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            
+
             {/* কন্ডিশনাল রেন্ডারিং: অ্যাডমিন প্যানেলে Navbar থাকবে না */}
             {!isAdminRoute && <Navbar />}
 
@@ -62,12 +65,15 @@ function App() {
                     <Route path="/product/:id" element={<ProductPage />} />
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
+                    <Route path="/payment" element={<PaymentPage />} />
+                    <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                    <Route path="/payment-failed" element={<PaymentFailedPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
                     <Route path="/track-order" element={<OrderTrackingPage />} />
                     <Route path="/search" element={<SearchPage />} />
                     <Route path="/notifications" element={<NotificationsPage />} />
-                    
+
                     {/* --- অকশন রাউটস (ইউজারদের জন্য) --- */}
                     <Route path="/auction/live" element={<LiveAuctionPage />} />
                     <Route path="/auction/archives" element={<ArchivesPage />} />
@@ -76,9 +82,9 @@ function App() {
                     <Route path="/client" element={<ClientPanel />} />
 
                     {/* ✅ অ্যাডমিন প্যানেল রাউটস (Admin Only) */}
-                    
+
                     {/* ১. ড্যাশবোর্ড */}
-                    <Route path="/admin" element={<AdminDashboard />} /> 
+                    <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/admin/login" element={<AdminLogin />} />
 
                     {/* ২. এই রাউটগুলো মিসিং ছিল, তাই বাটন কাজ করত না */}
@@ -100,7 +106,7 @@ function App() {
 
             {/* কন্ডিশনাল রেন্ডারিং: অ্যাডমিন প্যানেলে Footer থাকবে না */}
             {!isAdminRoute && <Footer />}
-            
+
         </div>
     );
 }

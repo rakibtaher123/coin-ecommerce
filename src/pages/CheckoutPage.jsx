@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Button, Typography, Paper, Grid, TextField, 
+  Box, Button, Typography, Paper, Grid, TextField,
   Dialog, DialogTitle, DialogContent,
   DialogActions, Divider, List, ListItem, ListItemText,
   ListItemAvatar, Avatar
@@ -33,7 +33,7 @@ function CheckoutPage() {
     city: ''
   });
   const [courier, setCourier] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState(''); 
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
@@ -49,11 +49,11 @@ function CheckoutPage() {
   };
 
   // ফর্ম ভ্যালিডেশন
-  const isFormValid = 
-    shippingInfo.firstName && 
-    shippingInfo.address && 
-    shippingInfo.phone && 
-    courier && 
+  const isFormValid =
+    shippingInfo.firstName &&
+    shippingInfo.address &&
+    shippingInfo.phone &&
+    courier &&
     paymentMethod;
 
   // ✅ অর্ডার সাবমিট ফাংশন (Backend API সহ)
@@ -66,7 +66,7 @@ function CheckoutPage() {
 
     // ১. লগইন চেক (অপশনাল, তবে ভালো প্র্যাকটিস)
     const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
-    
+
     // যদি লগইন ছাড়া অর্ডার নিতে না চান, তবে নিচের ৩ লাইন আন-কমেন্ট করুন
     /* if (!userInfo) {
        setOpenLoginDialog(true);
@@ -106,9 +106,9 @@ function CheckoutPage() {
       if (response.ok) {
         const data = await response.json();
         console.log('Order Created:', data);
-        
+
         alert(`🎉 Order Placed Successfully!\nOrder ID: ${data._id}\nTotal: ৳${totalPrice.toLocaleString()}`);
-        
+
         clearCart(); // কার্ট খালি করা
         navigate('/'); // হোমপেজে ফেরত যাওয়া
       } else {
@@ -123,6 +123,35 @@ function CheckoutPage() {
       navigate('/');
     } finally {
       setIsPlacingOrder(false);
+    }
+  };
+
+  // ✅ Proceed to Payment - Check login first
+  const handleProceedToPayment = () => {
+    if (cartItems.length === 0) {
+      alert("Your cart is empty!");
+      navigate('/');
+      return;
+    }
+
+    // Save checkout info to localStorage for payment page
+    const checkoutData = {
+      shippingInfo,
+      courier,
+      paymentMethod,
+      cartItems,
+      totalPrice
+    };
+    localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login with client redirect (payment will be in dashboard)
+      navigate('/login?redirect=client&showPayment=true');
+    } else {
+      // Navigate to client dashboard with payment section
+      navigate('/client?showPayment=true');
     }
   };
 
@@ -148,19 +177,19 @@ function CheckoutPage() {
 
   return (
     <Box sx={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
-      
-      <Typography variant="h4" fontWeight="bold" sx={{ mb: 4, color: '#1b5e20', textAlign:'center' }}>
+
+      <Typography variant="h4" fontWeight="bold" sx={{ mb: 4, color: '#1b5e20', textAlign: 'center' }}>
         Checkout Process
       </Typography>
 
       <Grid container spacing={4} maxWidth="xl" sx={{ mx: 'auto' }}>
         {/* --- বাম পাশ: ফর্ম --- */}
         <Grid item xs={12} md={7}>
-          
+
           {/* ১. শিপিং ঠিকানা */}
           <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display:'flex', alignItems:'center', gap:1 }}>
-              <span style={{background:'#1b5e20', color:'white', borderRadius:'50%', width:25, height:25, display:'flex', justifyContent:'center', alignItems:'center', fontSize:14}}>1</span>
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <span style={{ background: '#1b5e20', color: 'white', borderRadius: '50%', width: 25, height: 25, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 14 }}>1</span>
               Shipping Information
             </Typography>
             <Grid container spacing={2}>
@@ -184,8 +213,8 @@ function CheckoutPage() {
 
           {/* ২. কুরিয়ার নির্বাচন */}
           <Paper sx={{ p: 3, mb: 3, borderRadius: 2 }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display:'flex', alignItems:'center', gap:1 }}>
-              <span style={{background:'#1b5e20', color:'white', borderRadius:'50%', width:25, height:25, display:'flex', justifyContent:'center', alignItems:'center', fontSize:14}}>2</span>
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <span style={{ background: '#1b5e20', color: 'white', borderRadius: '50%', width: 25, height: 25, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 14 }}>2</span>
               Select Courier Service
             </Typography>
             <Grid container spacing={2}>
@@ -208,11 +237,11 @@ function CheckoutPage() {
 
           {/* ৩. পেমেন্ট মেথড */}
           <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display:'flex', alignItems:'center', gap:1 }}>
-              <span style={{background:'#1b5e20', color:'white', borderRadius:'50%', width:25, height:25, display:'flex', justifyContent:'center', alignItems:'center', fontSize:14}}>3</span>
+            <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <span style={{ background: '#1b5e20', color: 'white', borderRadius: '50%', width: 25, height: 25, display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: 14 }}>3</span>
               Payment Method
             </Typography>
-            
+
             <Typography variant="subtitle2" sx={{ color: '#1b5e20', fontWeight: 'bold', mt: 1, mb: 2 }}>
               ONLINE MOBILE PAYMENT (BD)
             </Typography>
@@ -220,7 +249,7 @@ function CheckoutPage() {
               {['bkash', 'nagad', 'rocket'].map((method) => (
                 <Grid item xs={12} sm={4} key={method}>
                   <Button onClick={() => setPaymentMethod(method)} sx={getSelectableButtonStyle(paymentMethod === method)}>
-                    <Box display="flex" alignItems="center" gap={1.5} sx={{textTransform:'capitalize'}}>
+                    <Box display="flex" alignItems="center" gap={1.5} sx={{ textTransform: 'capitalize' }}>
                       {/* লোগো না থাকলে টেক্সট দেখাবে */}
                       {method}
                     </Box>
@@ -240,7 +269,7 @@ function CheckoutPage() {
               </Box>
               {paymentMethod === 'cod' && <CheckCircleIcon color="success" />}
             </Button>
-            
+
           </Paper>
         </Grid>
 
@@ -255,18 +284,18 @@ function CheckoutPage() {
               {cartItems.map((item, index) => (
                 <ListItem key={index} sx={{ px: 0, py: 1.5, borderBottom: '1px dashed #eee' }}>
                   <ListItemAvatar>
-                    <Avatar 
-                        src={getImageUrl(item.image)} 
-                        variant="rounded"
-                        sx={{ bgcolor: 'transparent', border: '1px solid #eee' }}
-                        imgProps={{ style: { objectFit: 'contain' } }}
+                    <Avatar
+                      src={getImageUrl(item.image)}
+                      variant="rounded"
+                      sx={{ bgcolor: 'transparent', border: '1px solid #eee' }}
+                      imgProps={{ style: { objectFit: 'contain' } }}
                     >
-                        C
+                      C
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText 
-                    primary={item.name} 
-                    secondary={`Qty: ${item.qty} x ৳${item.price}`} 
+                  <ListItemText
+                    primary={item.name}
+                    secondary={`Qty: ${item.qty} x ৳${item.price}`}
                   />
                   <Typography fontWeight="bold">
                     ৳{(item.price * item.qty).toLocaleString()}
@@ -276,21 +305,21 @@ function CheckoutPage() {
             </List>
 
             <Box sx={{ mt: 3, p: 2, bgcolor: '#f9f9f9', borderRadius: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                    <Typography color="text.secondary">Subtotal</Typography>
-                    <Typography fontWeight="bold">৳{totalPrice.toLocaleString()}</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                    <Typography color="text.secondary">Shipping</Typography>
-                    <Typography fontWeight="bold" color="success.main">Free</Typography>
-                </Box>
-                <Divider />
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, alignItems: 'center' }}>
-                    <Typography variant="h6" fontWeight="bold">Total</Typography>
-                    <Typography variant="h5" color="primary" fontWeight="bold">
-                        ৳{totalPrice.toLocaleString()}
-                    </Typography>
-                </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography color="text.secondary">Subtotal</Typography>
+                <Typography fontWeight="bold">৳{totalPrice.toLocaleString()}</Typography>
+              </Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Typography color="text.secondary">Shipping</Typography>
+                <Typography fontWeight="bold" color="success.main">Free</Typography>
+              </Box>
+              <Divider />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2, alignItems: 'center' }}>
+                <Typography variant="h6" fontWeight="bold">Total</Typography>
+                <Typography variant="h5" color="primary" fontWeight="bold">
+                  ৳{totalPrice.toLocaleString()}
+                </Typography>
+              </Box>
             </Box>
 
             <Button
@@ -298,19 +327,19 @@ function CheckoutPage() {
               color="primary"
               size="large"
               fullWidth
-              onClick={handlePlaceOrder}
-              disabled={cartItems.length === 0 || !isFormValid || isPlacingOrder}
-              sx={{ 
-                  mt: 3, 
-                  py: 1.5, 
-                  fontSize: '1.1rem', 
-                  fontWeight: 'bold',
-                  boxShadow: '0 4px 12px rgba(27,94,32,0.3)',
-                  bgcolor: '#1b5e20',
-                  '&:hover': { bgcolor: '#004d40' } 
+              onClick={handleProceedToPayment}
+              disabled={cartItems.length === 0 || !isFormValid}
+              sx={{
+                mt: 3,
+                py: 1.5,
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                boxShadow: '0 4px 12px rgba(27,94,32,0.3)',
+                bgcolor: '#1b5e20',
+                '&:hover': { bgcolor: '#004d40' }
               }}
             >
-              {isPlacingOrder ? "Placing Order..." : "CONFIRM ORDER"}
+              PROCEED TO PAYMENT
             </Button>
           </Paper>
         </Grid>

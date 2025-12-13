@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get redirect URL from query params
+  const searchParams = new URLSearchParams(location.search);
+  const redirectTo = searchParams.get('redirect') || 'client';
+  const showPayment = searchParams.get('showPayment');
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError('');
 
     // ✅ Admin shortcut (local check)
     if (email === "admin@gmail.com" && password === "1234") {
@@ -36,14 +44,20 @@ const LoginPage = () => {
         if (data.user.role === "admin") {
           navigate("/admin");
         } else {
-          navigate("/");
+          // Redirect to specified page with showPayment parameter if present
+          const redirectPath = showPayment === 'true'
+            ? `/${redirectTo}?showPayment=true`
+            : `/${redirectTo}`;
+          console.log('Redirecting to:', redirectPath);
+          navigate(redirectPath);
         }
       } else {
+        setError(data.message || "Invalid Email or Password!");
         console.log(data.message || "Invalid Email or Password!");
       }
     } catch (error) {
       console.error("Login error:", error);
-      console.log("Server Error! ব্যাকএন্ড ইউআরএল বা রেসপন্সে সমস্যা হতে পারে");
+      setError("Server Error! Please try again.");
     }
   };
 
@@ -53,14 +67,20 @@ const LoginPage = () => {
         <h2 style={{ color: '#1f2937', marginBottom: '10px' }}>Login to Coin Collector</h2>
         <p style={{ color: '#6b7280', marginBottom: '30px', fontSize: '14px' }}>Welcome back! Please login to your account.</p>
 
+        {error && (
+          <div style={{ padding: '12px', backgroundColor: '#fee2e2', color: '#dc2626', borderRadius: '5px', marginBottom: '20px', fontSize: '14px' }}>
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom: '15px', textAlign: 'left' }}>
             <label style={{ display: 'block', marginBottom: '5px', fontSize: '12px', color: '#374151' }}>Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@example.com" 
+              placeholder="name@example.com"
               required
               style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #d1d5db', outline: 'none' }}
             />
@@ -68,18 +88,18 @@ const LoginPage = () => {
 
           <div style={{ marginBottom: '20px', textAlign: 'left' }}>
             <label style={{ display: 'block', marginBottom: '5px', fontSize: '12px', color: '#374151' }}>Password</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="********" 
+              placeholder="********"
               required
               style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #d1d5db', outline: 'none' }}
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             style={{ width: '100%', padding: '12px', backgroundColor: '#10b981', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', fontSize: '16px' }}
           >
             Login

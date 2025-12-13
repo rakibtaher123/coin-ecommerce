@@ -1,62 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, Typography, Button, Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Paper, Chip, IconButton, CircularProgress, Tooltip 
+import {
+  Box, Typography, Button, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Chip, IconButton, CircularProgress, Tooltip
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
-import StopCircleIcon from '@mui/icons-material/StopCircle';
-import axios from 'axios'; // API কলের জন্য
+import GavelIcon from '@mui/icons-material/Gavel';
+import axios from 'axios';
 
 // কম্পোনেন্ট ইম্পোর্ট
 import CreateAuction from '../components/CreateAuction';
 
-// আপনার ব্যাকএন্ড পোর্ট (নিশ্চিত করুন এটি সঠিক)
 const API_BASE_URL = "http://localhost:5000";
 
 const ManageAuctions = () => {
   const [auctions, setAuctions] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-  // মোডাল স্টেট
+
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [selectedAuctionToEdit, setSelectedAuctionToEdit] = useState(null);
 
-  // ✅ ১. ডাটাবেস থেকে রিয়েল ডাটা ফেচ করা
+  // Fetch auctions
   const fetchAuctions = async () => {
     try {
       setLoading(true);
-      // রিয়েল API কল (যদি ব্যাকএন্ড রেডি থাকে)
+      console.log('🔍 Fetching auctions from:', `${API_BASE_URL}/api/auctions`);
       const { data } = await axios.get(`${API_BASE_URL}/api/auctions`);
+      console.log('✅ Auctions fetched:', data);
+      console.log('📊 Number of auctions:', data.length);
       setAuctions(data);
     } catch (error) {
-      console.error("Error fetching auctions:", error);
-      // এরর হলে ডামি ডাটা দিয়ে চালানো (যাতে পেজ ফাঁকা না থাকে)
-      const dummyAuctions = [
-        {
-          _id: 1,
-          productName: "Rare Mughal Gold Mohur",
-          image: "/assets/mughal_empire/mughal_gold_mohur.jpg", 
-          basePrice: 50000,
-          highestBid: 55000,
-          startTime: "2025-12-10T10:00",
-          endTime: "2025-12-12T22:00",
-          status: "Live",
-        },
-        {
-          _id: 2,
-          productName: "Ancient Bengal Silver Tanka",
-          image: "/assets/ancient_bengal/azam_shah_tanka.jpg",
-          basePrice: 12000,
-          highestBid: 12000,
-          startTime: "2025-12-15T09:00",
-          endTime: "2025-12-16T21:00",
-          status: "Upcoming",
-        }
-      ];
-      setAuctions(dummyAuctions);
+      console.error("❌ Error fetching auctions:", error);
+      console.error("Error details:", error.response?.data || error.message);
+      setAuctions([]); // fallback empty array
     } finally {
       setLoading(false);
     }
@@ -66,44 +44,81 @@ const ManageAuctions = () => {
     fetchAuctions();
   }, []);
 
-  // ✅ ২. ডিলিট লজিক
+  // Delete auction
   const handleDelete = async (id) => {
     if (window.confirm("⚠️ Are you sure you want to delete this auction?")) {
       try {
-        // await axios.delete(`${API_BASE_URL}/api/auctions/${id}`); // রিয়েল ডিলিট
-        setAuctions(auctions.filter((auc) => auc._id !== id)); // লোকালে ডিলিট
+        await axios.delete(`${API_BASE_URL}/api/auctions/${id}`);
+        setAuctions(auctions.filter((auc) => auc._id !== id));
         alert("✅ Auction deleted successfully!");
       } catch (error) {
+        console.error(error);
         alert("❌ Failed to delete auction.");
       }
     }
   };
 
-  // এডিট হ্যান্ডলার
+  // Edit auction
   const handleEdit = (auction) => {
     setSelectedAuctionToEdit(auction);
     setOpenCreateModal(true);
   };
 
-  // নতুন ক্রিয়েট হ্যান্ডলার
+  // Create new auction
   const handleCreateNew = () => {
     setSelectedAuctionToEdit(null);
     setOpenCreateModal(true);
   };
 
-  // ✅ ৩. ইমেজ ফিক্স লজিক (সবচেয়ে গুরুত্বপূর্ণ)
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/assets/logos/coin_hero.jpg"; // ডিফল্ট লোগো
-    if (imagePath.startsWith("http")) return imagePath;   // অনলাইন লিংক হলে সরাসরি
-    return `${API_BASE_URL}${imagePath}`;               // লোকাল হলে ব্যাকএন্ড URL যোগ
+  // ⚡ MANUAL: Set auction to Live immediately
+  const handleSetLive = async (auction) => {
+    if (window.confirm(`🔴 Set "${auction.productName}" to LIVE status?`)) {
+      try {
+        // ✅ Use simple PATCH endpoint - only sends status!
+        await axios.patch(`${API_BASE_URL}/api/auctions/${auction._id}/status`, {
+          status: 'Live'
+        });
+
+        alert("✅ Auction is now LIVE!");
+        fetchAuctions(); // Refresh list
+      } catch (error) {
+        console.error("❌ Set Live Error:", error);
+        console.error("Error details:", error.response?.data);
+        alert(`❌ Failed: ${error.response?.data?.message || error.message}`);
+      }
+    }
   };
 
-  // স্ট্যাটাস কালার
+  // 🏁 MANUAL: End auction and move to archives
+  const handleSetEnded = async (auction) => {
+    if (window.confirm(`🏁 End "${auction.productName}" and move to Archives?`)) {
+      try {
+        await axios.patch(`${API_BASE_URL}/api/auctions/${auction._id}/status`, {
+          status: 'Ended'
+        });
+
+        alert("✅ Auction ended! Check Archives page.");
+        fetchAuctions(); // Refresh list
+      } catch (error) {
+        console.error("❌ Set Ended Error:", error);
+        alert(`❌ Failed: ${error.response?.data?.message || error.message}`);
+      }
+    }
+  };
+
+  // Image helper
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return "/assets/logos/coin_hero.jpg";
+    if (imagePath.startsWith("http")) return imagePath;
+    return `${API_BASE_URL}${imagePath}`;
+  };
+
+  // Status color helper
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Live': return 'error';     
-      case 'Upcoming': return 'warning'; 
-      case 'Ended': return 'default';    
+      case 'Live': return 'error';
+      case 'Upcoming': return 'warning';
+      case 'Ended': return 'default';
       default: return 'primary';
     }
   };
@@ -114,9 +129,9 @@ const ManageAuctions = () => {
         <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1b5e20' }}>
           Manage Auctions
         </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
+        <Button
+          variant="contained"
+          color="primary"
           startIcon={<AddIcon />}
           sx={{ fontWeight: 'bold' }}
           onClick={handleCreateNew}
@@ -139,7 +154,7 @@ const ManageAuctions = () => {
           </TableHead>
           <TableBody>
             {loading ? (
-              <TableRow><TableCell colSpan={6} align="center"><CircularProgress/></TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} align="center"><CircularProgress /></TableCell></TableRow>
             ) : auctions.length === 0 ? (
               <TableRow><TableCell colSpan={6} align="center">No auctions found.</TableCell></TableRow>
             ) : (
@@ -147,19 +162,18 @@ const ManageAuctions = () => {
                 <TableRow key={row._id} hover>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      {/* ✅ ফিক্সড ইমেজ ফাংশন ব্যবহার */}
-                      <img 
-                        src={getImageUrl(row.image)} 
-                        alt={row.productName} 
-                        onError={(e) => e.target.src = "/assets/logos/coin_hero.jpg"} // ফলব্যাক
-                        style={{ 
-                          width: '50px', 
-                          height: '50px', 
-                          borderRadius: '8px', 
-                          objectFit: 'cover', 
+                      <img
+                        src={getImageUrl(row.productImage)}
+                        alt={row.productName}
+                        onError={(e) => e.target.src = "/assets/logos/coin_hero.jpg"}
+                        style={{
+                          width: '50px',
+                          height: '50px',
+                          borderRadius: '8px',
+                          objectFit: 'cover',
                           border: '1px solid #ddd',
-                          backgroundColor: '#f0f0f0' 
-                        }} 
+                          backgroundColor: '#f0f0f0'
+                        }}
                       />
                       <Typography variant="body2" fontWeight="bold">{row.productName}</Typography>
                     </Box>
@@ -173,14 +187,40 @@ const ManageAuctions = () => {
                     <Typography variant="caption" color="text.secondary">End: {row.endTime.replace('T', ' ')}</Typography>
                   </TableCell>
                   <TableCell>
-                    <Chip 
-                      label={row.status} 
-                      size="small" 
+                    <Chip
+                      label={row.status}
+                      size="small"
                       color={getStatusColor(row.status)}
                       icon={row.status === 'Live' ? <PlayCircleFilledIcon /> : undefined}
                     />
                   </TableCell>
                   <TableCell align="center">
+                    {/* ⚡ SET LIVE button (only for Upcoming) */}
+                    {row.status === 'Upcoming' && (
+                      <Tooltip title="Set Live Now">
+                        <IconButton
+                          color="error"
+                          onClick={() => handleSetLive(row)}
+                          sx={{ mr: 1 }}
+                        >
+                          <PlayCircleFilledIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    {/* 🏁 END AUCTION button (only for Live) */}
+                    {row.status === 'Live' && (
+                      <Tooltip title="End & Archive">
+                        <IconButton
+                          color="warning"
+                          onClick={() => handleSetEnded(row)}
+                          sx={{ mr: 1 }}
+                        >
+                          <GavelIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
                     <Tooltip title="Edit">
                       <IconButton color="primary" onClick={() => handleEdit(row)}>
                         <EditIcon />
@@ -199,14 +239,13 @@ const ManageAuctions = () => {
         </Table>
       </TableContainer>
 
-      {/* ✅ Create/Edit পপআপ কল */}
-      <CreateAuction 
-        open={openCreateModal} 
+      <CreateAuction
+        open={openCreateModal}
         onClose={() => {
           setOpenCreateModal(false);
-          fetchAuctions(); // মডাল বন্ধ হলে লিস্ট রিফ্রেশ হবে
-        }} 
-        auctionData={selectedAuctionToEdit} 
+          fetchAuctions();
+        }}
+        auctionData={selectedAuctionToEdit}
       />
     </Box>
   );
