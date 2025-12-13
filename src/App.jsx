@@ -27,6 +27,14 @@ import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentFailedPage from './pages/PaymentFailedPage';
 
+// Client Dashboard Pages
+import ClientProductsPage from './pages/ClientProductsPage';
+import ClientOrdersPage from './pages/ClientOrdersPage';
+import ClientSettingsPage from './pages/ClientSettingsPage';
+import ClientAddressPage from './pages/ClientAddressPage';
+import ClientPaymentsPage from './pages/ClientPaymentsPage';
+import ClientAuctionsPage from './pages/ClientAuctionsPage';
+
 // ✅ অ্যাডমিন পেজ ইম্পোর্ট (নতুন পেজগুলো যুক্ত করা হয়েছে)
 import AdminDashboard from './Admin/pages/Dashboard';
 import AdminLogin from './Admin/pages/AdminLogin';
@@ -44,8 +52,11 @@ import FeedbackPage from './Admin/pages/FeedbackPage';     // নতুন (ফ�
 function App() {
     const location = useLocation();
 
-    // 🛑 যদি URL '/admin' বা '/client' দিয়ে শুরু হয়, তাহলে Navbar ও Footer দেখাবে না
-    const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname.startsWith('/client');
+    // 🛑 যদি URL '/admin', '/client', '/auction', বা '/payment' দিয়ে শুরু হয়, তাহলে Navbar ও Footer দেখাবে না
+    const isAdminRoute = location.pathname.startsWith('/admin') ||
+        location.pathname.startsWith('/client') ||
+        location.pathname.startsWith('/auction') ||
+        location.pathname.startsWith('/payment');
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -80,6 +91,12 @@ function App() {
 
                     {/* --- ক্লায়েন্ট ড্যাশবোর্ড --- */}
                     <Route path="/client" element={<ClientPanel />} />
+                    <Route path="/client/products" element={<ClientProductsPage />} />
+                    <Route path="/client/orders" element={<ClientOrdersPage />} />
+                    <Route path="/client/settings" element={<ClientSettingsPage />} />
+                    <Route path="/client/address" element={<ClientAddressPage />} />
+                    <Route path="/client/payments" element={<ClientPaymentsPage />} />
+                    <Route path="/client/auctions" element={<ClientAuctionsPage />} />
 
                     {/* ✅ অ্যাডমিন প্যানেল রাউটস (Admin Only) */}
 

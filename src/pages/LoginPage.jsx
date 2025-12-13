@@ -44,12 +44,10 @@ const LoginPage = () => {
         if (data.user.role === "admin") {
           navigate("/admin");
         } else {
-          // Redirect to specified page with showPayment parameter if present
-          const redirectPath = showPayment === 'true'
-            ? `/${redirectTo}?showPayment=true`
-            : `/${redirectTo}`;
-          console.log('Redirecting to:', redirectPath);
-          navigate(redirectPath);
+          // Redirect to specified page or default to client dashboard
+          const redirectPath = redirectTo || 'client';
+          console.log('Redirecting to:', `/${redirectPath}`);
+          navigate(`/${redirectPath}`);
         }
       } else {
         setError(data.message || "Invalid Email or Password!");

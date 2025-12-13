@@ -147,11 +147,11 @@ function CheckoutPage() {
     // Check if user is logged in
     const token = localStorage.getItem('token');
     if (!token) {
-      // Redirect to login with client redirect (payment will be in dashboard)
-      navigate('/login?redirect=client&showPayment=true');
+      // Redirect to login with payment redirect
+      navigate('/login?redirect=payment');
     } else {
-      // Navigate to client dashboard with payment section
-      navigate('/client?showPayment=true');
+      // Navigate directly to payment page
+      navigate('/payment');
     }
   };
 

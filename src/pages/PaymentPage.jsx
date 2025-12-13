@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Box, Container, Paper, Typography, Button, Grid, Divider,
     List, ListItem, ListItemText, CircularProgress, Alert
@@ -8,19 +8,44 @@ import { Payment, CheckCircle, LocalShipping } from '@mui/icons-material';
 
 const PaymentPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [checkoutData, setCheckoutData] = useState(null);
+    const [isAuctionBid, setIsAuctionBid] = useState(false);
 
     useEffect(() => {
-        // Get saved checkout data
+        // Check if payment is from auction bid (location.state)
+        if (location.state?.amount && location.state?.productName) {
+            setIsAuctionBid(true);
+            setCheckoutData({
+                totalPrice: location.state.amount,
+                cartItems: [{
+                    name: location.state.productName,
+                    price: location.state.amount,
+                    qty: 1
+                }],
+                shippingInfo: {
+                    firstName: 'Demo',
+                    lastName: 'User',
+                    address: 'N/A (Auction Bid)',
+                    city: 'Dhaka',
+                    phone: '01711223344'
+                },
+                courier: 'N/A',
+                paymentMethod: 'SSLCommerz'
+            });
+            return;
+        }
+
+        // Otherwise, get saved checkout data from localStorage
         const savedData = localStorage.getItem('checkoutData');
         if (!savedData) {
             navigate('/checkout');
             return;
         }
         setCheckoutData(JSON.parse(savedData));
-    }, [navigate]);
+    }, [navigate, location]);
 
     const handlePayment = async () => {
         setLoading(true);

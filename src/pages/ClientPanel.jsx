@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  Box, Grid, Paper, Typography, Button, Container, CircularProgress, Card, CardContent,
-  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tabs, Tab
+  Box, Grid, Paper, Typography, Button, Container, CircularProgress,
+  Card, CardContent
 } from '@mui/material';
 import {
   ShoppingBag, AttachMoney, HourglassEmpty, CheckCircle,
@@ -11,11 +11,7 @@ import {
 
 const ClientPanel = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(0);
-  const [checkoutData, setCheckoutData] = useState(null);
-  const [paymentLoading, setPaymentLoading] = useState(false);
 
   // User & Stats State
   const [userName, setUserName] = useState('Valued Customer');
@@ -26,9 +22,6 @@ const ClientPanel = () => {
     completedOrders: 0,
     totalSpent: 0
   });
-
-  // Sample orders data (in real app, fetch from backend)
-  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     // Check authentication
@@ -46,43 +39,17 @@ const ClientPanel = () => {
       console.error('Error parsing token:', err);
     }
 
-    // Check if showPayment parameter is present
-    const searchParams = new URLSearchParams(location.search);
-    const shouldShowPayment = searchParams.get('showPayment') === 'true';
-
-    if (shouldShowPayment) {
-      // Load checkout data
-      const savedCheckoutData = localStorage.getItem('checkoutData');
-      console.log('ShowPayment is true, loading checkout data:', savedCheckoutData);
-      if (savedCheckoutData) {
-        try {
-          const parsedData = JSON.parse(savedCheckoutData);
-          setCheckoutData(parsedData);
-          setActiveTab(4); // Set to Complete Payment tab (index 4)
-          console.log('Checkout data loaded, setting tab to 4');
-        } catch (err) {
-          console.error('Error parsing checkout data:', err);
-        }
-      } else {
-        console.log('No checkout data found in localStorage');
-      }
-    }
-
     // In real app, fetch user data and stats from backend
     setTimeout(() => {
       setLoading(false);
     }, 500);
-  }, [navigate, location]);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userEmail');
     navigate('/login');
-  };
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
   };
 
   // Stat Card Component (matching admin style)
@@ -214,7 +181,7 @@ const ClientPanel = () => {
               title="Browse Products"
               icon={<ShoppingBag />}
               color="#1976d2" // Blue
-              onClick={() => navigate('/e-shop')}
+              onClick={() => navigate('/client/products')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -222,7 +189,7 @@ const ClientPanel = () => {
               title="Live Auctions"
               icon={<Gavel />}
               color="#d32f2f" // Red
-              onClick={() => navigate('/auction/live')}
+              onClick={() => navigate('/client/auctions')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -230,7 +197,7 @@ const ClientPanel = () => {
               title="My Orders"
               icon={<ShoppingBag />}
               color="#ed6c02" // Orange
-              onClick={() => setActiveTab(0)}
+              onClick={() => navigate('/client/orders')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -238,7 +205,7 @@ const ClientPanel = () => {
               title="Profile Settings"
               icon={<AccountCircle />}
               color="#7b1fa2" // Purple
-              onClick={() => setActiveTab(1)}
+              onClick={() => navigate('/client/settings')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -246,7 +213,7 @@ const ClientPanel = () => {
               title="Addresses"
               icon={<LocationOn />}
               color="#0288d1" // Info Blue
-              onClick={() => setActiveTab(2)}
+              onClick={() => navigate('/client/address')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -254,248 +221,10 @@ const ClientPanel = () => {
               title="Payment Methods"
               icon={<Payment />}
               color="#455a64" // Grey
-              onClick={() => setActiveTab(3)}
+              onClick={() => navigate('/client/payments')}
             />
           </Grid>
         </Grid>
-
-        {/* Main Content with Tabs */}
-        <Paper sx={{ p: 3 }}>
-          <Tabs value={activeTab} onChange={handleTabChange} sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-            <Tab label="My Orders" />
-            <Tab label="Profile" />
-            <Tab label="Addresses" />
-            <Tab label="Payment Methods" />
-            <Tab label="Complete Payment" />
-          </Tabs>
-
-          {/* Tab 0: Orders */}
-          {activeTab === 0 && (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Order History</Typography>
-              {orders.length === 0 ? (
-                <Box sx={{ textAlign: 'center', py: 6 }}>
-                  <ShoppingBag sx={{ fontSize: 64, color: '#ccc', mb: 2 }} />
-                  <Typography variant="h6" color="text.secondary" gutterBottom>
-                    No Orders Yet
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                    Start shopping to see your orders here
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/e-shop')}
-                    sx={{ bgcolor: '#1976d2' }}
-                  >
-                    Browse Products
-                  </Button>
-                </Box>
-              ) : (
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell><strong>Order ID</strong></TableCell>
-                        <TableCell><strong>Date</strong></TableCell>
-                        <TableCell><strong>Items</strong></TableCell>
-                        <TableCell><strong>Total</strong></TableCell>
-                        <TableCell><strong>Status</strong></TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {orders.map((order) => (
-                        <TableRow key={order.id}>
-                          <TableCell>{order.id}</TableCell>
-                          <TableCell>{order.date}</TableCell>
-                          <TableCell>{order.items}</TableCell>
-                          <TableCell>৳ {order.total}</TableCell>
-                          <TableCell>
-                            <Chip
-                              label={order.status}
-                              color={order.status === 'Delivered' ? 'success' : 'warning'}
-                              size="small"
-                            />
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </Box>
-          )}
-
-          {/* Tab 1: Profile */}
-          {activeTab === 1 && (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Profile Settings</Typography>
-              <Typography variant="body1" color="text.secondary">
-                Profile management features will be available soon.
-              </Typography>
-            </Box>
-          )}
-
-          {/* Tab 2: Addresses */}
-          {activeTab === 2 && (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Saved Addresses</Typography>
-              <Typography variant="body1" color="text.secondary">
-                Address management features will be available soon.
-              </Typography>
-            </Box>
-          )}
-
-          {/* Tab 3: Payment Methods */}
-          {activeTab === 3 && (
-            <Box>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>Payment Methods</Typography>
-              <Typography variant="body1" color="text.secondary">
-                Payment method management features will be available soon.
-              </Typography>
-            </Box>
-          )}
-
-          {/* Tab 4: Complete Payment */}
-          {activeTab === 4 && (
-            <Box>
-              {checkoutData ? (
-                <>
-                  <Typography variant="h5" fontWeight="bold" gutterBottom sx={{ color: '#1b5e20' }}>
-                    Complete Your Payment
-                  </Typography>
-
-                  {/* Order Summary */}
-                  <Paper sx={{ p: 3, mb: 3, bgcolor: '#f9f9f9' }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      Order Summary
-                    </Typography>
-                    {checkoutData.cartItems.map((item, idx) => (
-                      <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography>{item.name} x {item.qty}</Typography>
-                        <Typography fontWeight="bold">৳{(item.price * item.qty).toLocaleString()}</Typography>
-                      </Box>
-                    ))}
-                    <Box sx={{ borderTop: 1, borderColor: 'divider', pt: 2, mt: 2 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography>Subtotal:</Typography>
-                        <Typography>৳{checkoutData.totalPrice.toLocaleString()}</Typography>
-                      </Box>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
-                        <Typography variant="h6">Total:</Typography>
-                        <Typography variant="h6" color="primary">৳{checkoutData.totalPrice.toLocaleString()}</Typography>
-                      </Box>
-                    </Box>
-                  </Paper>
-
-                  {/* Shipping Details */}
-                  <Paper sx={{ p: 3, mb: 3 }}>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      Shipping Details
-                    </Typography>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12}>
-                        <Typography color="text.secondary" variant="body2">Name:</Typography>
-                        <Typography fontWeight="bold">{checkoutData.shippingInfo.firstName} {checkoutData.shippingInfo.lastName}</Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography color="text.secondary" variant="body2">Address:</Typography>
-                        <Typography fontWeight="bold">{checkoutData.shippingInfo.address}</Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Typography color="text.secondary" variant="body2">Phone:</Typography>
-                        <Typography fontWeight="bold">{checkoutData.shippingInfo.phone}</Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Typography color="text.secondary" variant="body2">Courier:</Typography>
-                        <Typography fontWeight="bold">{checkoutData.courier}</Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Typography color="text.secondary" variant="body2">Payment Method:</Typography>
-                        <Typography fontWeight="bold" sx={{ textTransform: 'uppercase' }}>{checkoutData.paymentMethod}</Typography>
-                      </Grid>
-                    </Grid>
-                  </Paper>
-
-                  {/* Payment Button */}
-                  <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    onClick={async () => {
-                      setPaymentLoading(true);
-                      try {
-                        const token = localStorage.getItem('token');
-                        const userPayload = token ? JSON.parse(atob(token.split('.')[1])) : {};
-
-                        const paymentData = {
-                          amount: checkoutData.totalPrice,
-                          orderInfo: {
-                            productName: checkoutData.cartItems.map(item => item.name).join(', '),
-                            items: checkoutData.cartItems.length
-                          },
-                          customerInfo: {
-                            name: checkoutData.shippingInfo.firstName + ' ' + (checkoutData.shippingInfo.lastName || ''),
-                            email: userPayload.email || 'customer@example.com',
-                            phone: checkoutData.shippingInfo.phone,
-                            address: checkoutData.shippingInfo.address,
-                            city: checkoutData.shippingInfo.city || 'Dhaka'
-                          }
-                        };
-
-                        const response = await fetch('http://localhost:5000/api/payment/initiate', {
-                          method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                          },
-                          body: JSON.stringify(paymentData)
-                        });
-
-                        const data = await response.json();
-
-                        if (data.success && data.gatewayUrl) {
-                          window.location.href = data.gatewayUrl;
-                        } else {
-                          alert('Payment initiation failed: ' + (data.message || 'Unknown error'));
-                        }
-                      } catch (err) {
-                        console.error('Payment error:', err);
-                        alert('Failed to connect to payment gateway');
-                      } finally {
-                        setPaymentLoading(false);
-                      }
-                    }}
-                    disabled={paymentLoading}
-                    sx={{
-                      py: 2,
-                      bgcolor: '#1b5e20',
-                      '&:hover': { bgcolor: '#004d40' }
-                    }}
-                  >
-                    {paymentLoading ? <CircularProgress size={24} color="inherit" /> : 'Proceed to SSLCommerz Payment'}
-                  </Button>
-                </>
-              ) : (
-                <Box sx={{ textAlign: 'center', py: 6 }}>
-                  <Payment sx={{ fontSize: 64, color: '#ccc', mb: 2 }} />
-                  <Typography variant="h6" color="text.secondary" gutterBottom>
-                    No Checkout Data Found
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                    Please go to checkout and complete your order first
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    onClick={() => navigate('/cart')}
-                    sx={{ bgcolor: '#1b5e20', '&:hover': { bgcolor: '#004d40' } }}
-                  >
-                    Go to Cart
-                  </Button>
-                </Box>
-              )}
-            </Box>
-          )}
-        </Paper>
       </Container>
     </Box>
   );

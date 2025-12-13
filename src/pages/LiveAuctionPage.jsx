@@ -93,11 +93,25 @@ const LiveAuctionPage = () => {
   };
 
   const handleBid = () => {
+    // Auto-login with demo user if not logged in (FOR TESTING)
     if (!isLoggedIn) {
-      alert("⚠️ You must log in to place a bid!");
-      navigate('/login');
-      return;
+      console.log('🔓 Auto-login: Creating demo user session...');
+      // Create a demo JWT token
+      const demoUser = {
+        id: 'demo123',
+        email: 'demo@coinhouse.com',
+        name: 'Demo User',
+        role: 'user'
+      };
+      // Simple base64 encoded token (for demo purposes only)
+      const demoToken = btoa(JSON.stringify(demoUser));
+      localStorage.setItem('token', demoToken);
+      localStorage.setItem('userEmail', demoUser.email);
+      localStorage.setItem('userRole', demoUser.role);
+      console.log('✅ Demo user logged in automatically!');
+      // Continue with bid
     }
+
     if (user?.role === 'admin') {
       alert("❌ Admins cannot bid.");
       return;
