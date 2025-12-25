@@ -27,12 +27,11 @@ exports.registerUser = async (req, res) => {
       return res.status(409).json({ error: "User already exists with this email" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // Password will be hashed automatically by the User model's pre-save hook
     const newUser = new User({
       name: name.trim(),
       email: normalizedEmail,
-      password: hashedPassword,
+      password: password,  // Pass plain password, let model hash it
       role: role === "admin" ? "admin" : "client"
     });
 

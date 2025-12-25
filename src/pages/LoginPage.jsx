@@ -45,9 +45,14 @@ const LoginPage = () => {
           navigate("/admin");
         } else {
           // Redirect to specified page or default to client dashboard
-          const redirectPath = redirectTo || 'client';
-          console.log('Redirecting to:', `/${redirectPath}`);
-          navigate(`/${redirectPath}`);
+          if (redirectTo === 'payment') {
+            console.log('Redirecting to payment page');
+            navigate('/payment');
+          } else {
+            const redirectPath = redirectTo || 'client';
+            console.log('Redirecting to:', `/${redirectPath}`);
+            navigate(`/${redirectPath}`);
+          }
         }
       } else {
         setError(data.message || "Invalid Email or Password!");
@@ -105,7 +110,7 @@ const LoginPage = () => {
         </form>
 
         <div style={{ marginTop: '20px', fontSize: '14px', color: '#374151' }}>
-          Don't have an account? <Link to="/signup" style={{ color: '#10b981', fontWeight: 'bold', textDecoration: 'none' }}>Sign Up</Link>
+          Don't have an account? <Link to="/register" style={{ color: '#10b981', fontWeight: 'bold', textDecoration: 'none' }}>Sign Up</Link>
         </div>
       </div>
     </div>

@@ -21,7 +21,9 @@ import OrderTrackingPage from './pages/OrderTrackingPage';
 import SearchPage from './pages/SearchPage';
 import NotificationsPage from './pages/NotificationsPage';
 import LiveAuctionPage from './pages/LiveAuctionPage';
+import LiveBiddingPage from './pages/LiveBiddingPage';
 import ArchivesPage from './pages/ArchivesPage';
+import BidHistoryPage from './pages/BidHistoryPage';
 import ClientPanel from './pages/ClientPanel';
 import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
@@ -42,6 +44,7 @@ import AdminLogin from './Admin/pages/AdminLogin';
 // 🔥 MISSING IMPORTS ADDED HERE
 import ManageAuctions from './Admin/pages/ManageAuctions';
 import LiveBiddingMonitor from './Admin/pages/LiveBiddingMonitor';
+import LiveBiddingSystem from './Admin/pages/LiveBiddingSystem'; // নতুন
 import AuctionHistory from './Admin/pages/AuctionHistory';
 import ManageProducts from './Admin/pages/ManageProducts'; // নতুন
 import ViewOrders from './Admin/pages/ViewOrders';         // নতুন
@@ -88,6 +91,8 @@ function App() {
                     {/* --- অকশন রাউটস (ইউজারদের জন্য) --- */}
                     <Route path="/auction/live" element={<LiveAuctionPage />} />
                     <Route path="/auction/archives" element={<ArchivesPage />} />
+                    <Route path="/auction/bidding" element={<LiveBiddingPage />} />
+                    <Route path="/auction/bid-history" element={<BidHistoryPage />} />
 
                     {/* --- ক্লায়েন্ট ড্যাশবোর্ড --- */}
                     <Route path="/client" element={<ClientPanel />} />
@@ -113,6 +118,7 @@ function App() {
 
                     {/* ৩. অকশন ম্যানেজমেন্ট রাউটস */}
                     <Route path="/admin/auctions" element={<ManageAuctions />} />
+                    <Route path="/admin/auctions/live-system" element={<LiveBiddingSystem />} />
                     <Route path="/admin/auctions/live/:id" element={<LiveBiddingMonitor />} />
                     <Route path="/admin/auctions/history" element={<AuctionHistory />} />
 

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Box, Grid, Paper, Typography, Button, Container, CircularProgress, Card, CardContent, Alert 
+import {
+  Box, Grid, Paper, Typography, Button, Container, CircularProgress, Card, CardContent, Alert
 } from '@mui/material';
-import { 
-  Inventory, ShoppingCart, People, AttachMoney, 
-  Gavel, Settings, Logout, Feedback, LocalShipping 
+import {
+  Inventory, ShoppingCart, People, AttachMoney,
+  Gavel, Settings, Logout, Feedback, LocalShipping
 } from '@mui/icons-material';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  
+
   // Dashboard Stats State
   const [stats, setStats] = useState({
     totalIncome: 0,
@@ -19,14 +19,14 @@ const Dashboard = () => {
     totalProducts: 0,
     totalUsers: 0
   });
-  
+
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
 
   // 🔐 Security & Data Fetching
   useEffect(() => {
     const token = localStorage.getItem("token");
-    
+
     // Load Stats
     fetchDashboardStats(token);
   }, [navigate]);
@@ -81,11 +81,11 @@ const Dashboard = () => {
 
   // Reusable Action Button Component
   const ActionButton = ({ title, icon, color, path }) => (
-    <Card 
+    <Card
       onClick={() => navigate(path)}
-      sx={{ 
-        cursor: 'pointer', 
-        transition: 'all 0.3s ease', 
+      sx={{
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
         '&:hover': { transform: 'translateY(-5px)', boxShadow: 10 },
         bgcolor: color,
         color: 'white',
@@ -107,16 +107,16 @@ const Dashboard = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f4f6f8', pb: 8 }}>
-      
+
       {/* --- Header --- */}
       <Box sx={{ bgcolor: 'white', px: 4, py: 2, boxShadow: 1, mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1b5e20', display: 'flex', alignItems: 'center', gap: 1 }}>
           🛡️ Admin Dashboard
         </Typography>
-        <Button 
-          variant="contained" 
-          color="error" 
-          startIcon={<Logout />} 
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<Logout />}
           onClick={handleLogout}
           sx={{ fontWeight: 'bold' }}
         >
@@ -137,40 +137,40 @@ const Dashboard = () => {
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#444', borderLeft: '5px solid #1b5e20', pl: 2 }}>
               Live Store Overview
             </Typography>
-            
+
             <Grid container spacing={3} sx={{ mb: 6 }}>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard 
-                  title="TOTAL INCOME" 
-                  value={`৳ ${stats.totalIncome?.toLocaleString() || 0}`} 
-                  icon={<AttachMoney fontSize="large" />} 
+                <StatCard
+                  title="TOTAL INCOME"
+                  value={`৳ ${stats.totalIncome?.toLocaleString() || 0}`}
+                  icon={<AttachMoney fontSize="large" />}
                   color="#1b5e20" // Green
                   subText="Lifetime Earnings"
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard 
-                  title="TOTAL ORDERS" 
-                  value={stats.totalOrders || 0} 
-                  icon={<ShoppingCart fontSize="large" />} 
+                <StatCard
+                  title="TOTAL ORDERS"
+                  value={stats.totalOrders || 0}
+                  icon={<ShoppingCart fontSize="large" />}
                   color="#f57c00" // Orange
                   subText={`${stats.pendingOrders || 0} Pending`}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard 
-                  title="TOTAL PRODUCTS" 
-                  value={stats.totalProducts || 0} 
-                  icon={<Inventory fontSize="large" />} 
+                <StatCard
+                  title="TOTAL PRODUCTS"
+                  value={stats.totalProducts || 0}
+                  icon={<Inventory fontSize="large" />}
                   color="#1976d2" // Blue
                   subText="Items in Stock"
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <StatCard 
-                  title="ACTIVE USERS" 
-                  value={stats.totalUsers || 0} 
-                  icon={<People fontSize="large" />} 
+                <StatCard
+                  title="ACTIVE USERS"
+                  value={stats.totalUsers || 0}
+                  icon={<People fontSize="large" />}
                   color="#7b1fa2" // Purple
                   subText="Registered Clients"
                 />
@@ -183,57 +183,84 @@ const Dashboard = () => {
             </Typography>
 
             <Grid container spacing={3}>
-              
+
               <Grid item xs={12} sm={6} md={4}>
-                <ActionButton 
-                  title="Manage Products" 
-                  icon={<Inventory />} 
+                <ActionButton
+                  title="Manage Products"
+                  icon={<Inventory />}
                   color="#2e7d32" // Green
                   path="/admin/products"
                 />
               </Grid>
 
-              {/* 🔥 Manage Auctions Button */}
+              {/* 🔥 Auction Management Buttons */}
               <Grid item xs={12} sm={6} md={4}>
-                <ActionButton 
-                  title="Manage Auctions" 
-                  icon={<Gavel />} 
+                <ActionButton
+                  title="E-AuctionHouse"
+                  icon={<Gavel />}
                   color="#d32f2f" // Red
                   path="/admin/auctions"
                 />
               </Grid>
 
               <Grid item xs={12} sm={6} md={4}>
-                <ActionButton 
-                  title="View Orders" 
-                  icon={<LocalShipping />} 
+                <ActionButton
+                  title="Archives"
+                  icon={<Gavel />}
+                  color="#0288d1" // Blue
+                  path="/admin/auctions/history"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <ActionButton
+                  title="Live Bidding System"
+                  icon={<Gavel />}
+                  color="#ed6c02" // Orange
+                  path="/admin/auctions/live-system"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <ActionButton
+                  title="Bid History"
+                  icon={<Gavel />}
+                  color="#7b1fa2" // Purple
+                  path="/admin/auctions/history"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={4}>
+                <ActionButton
+                  title="View Orders"
+                  icon={<LocalShipping />}
                   color="#ed6c02" // Orange
                   path="/admin/orders"
                 />
               </Grid>
 
               <Grid item xs={12} sm={6} md={4}>
-                <ActionButton 
-                  title="Manage Users" 
-                  icon={<People />} 
+                <ActionButton
+                  title="Manage Users"
+                  icon={<People />}
                   color="#0288d1" // Info Blue
                   path="/admin/users"
                 />
               </Grid>
 
               <Grid item xs={12} sm={6} md={4}>
-                <ActionButton 
-                  title="Feedbacks" 
-                  icon={<Feedback />} 
+                <ActionButton
+                  title="Feedbacks"
+                  icon={<Feedback />}
                   color="#9c27b0" // Purple
                   path="/admin/feedback"
                 />
               </Grid>
 
               <Grid item xs={12} sm={6} md={4}>
-                <ActionButton 
-                  title="Site Settings" 
-                  icon={<Settings />} 
+                <ActionButton
+                  title="Site Settings"
+                  icon={<Settings />}
                   color="#455a64" // Grey
                   path="/admin/settings"
                 />

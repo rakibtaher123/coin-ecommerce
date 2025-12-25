@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -8,6 +8,11 @@ function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get redirect URL from query params
+  const searchParams = new URLSearchParams(location.search);
+  const redirectTo = searchParams.get('redirect');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -19,14 +24,31 @@ function Login() {
       const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
 
       if (res.data?.token && res.data?.user?.role) {
-        // ✅ Save token + role
+        // ✅ Save token + role + email
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('userRole', res.data.user.role);
+        localStorage.setItem('userEmail', res.data.user.email || email); // Save email for bid functionality
 
         console.log('🎉 Login successful!');
+        console.log('Redirect parameter:', redirectTo);
 
-        // Role অনুযায়ী redirect
-        navigate(res.data.user.role === "admin" ? '/admin' : '/');
+        // ✅ Check for redirect parameter first, then role-based redirect
+        if (redirectTo) {
+          // Decode the redirect URL (in case it's URL encoded)
+          let decodedPath = decodeURIComponent(redirectTo);
+          console.log('Decoded redirect path:', decodedPath);
+
+          // Ensure path starts with /
+          if (!decodedPath.startsWith('/')) {
+            decodedPath = '/' + decodedPath;
+          }
+
+          console.log('Redirecting to:', decodedPath);
+          navigate(decodedPath, { replace: true });
+        } else {
+          // Role based redirect
+          navigate(res.data.user.role === "admin" ? '/admin' : '/');
+        }
       } else {
         setError('Invalid response from server');
       }
@@ -53,28 +75,28 @@ function Login() {
         )}
 
         <form onSubmit={handleLogin}>
-          <input 
-            type="email" 
+          <input
+            type="email"
             name="email"
-            placeholder="Email Address" 
-            value={email} 
-            onChange={e => setEmail(e.target.value)} 
-            required 
-            style={inputStyle} 
+            placeholder="Email Address"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            style={inputStyle}
           />
-          <input 
-            type="password" 
+          <input
+            type="password"
             name="password"
-            placeholder="Password" 
-            value={password} 
-            onChange={e => setPassword(e.target.value)} 
-            required 
-            style={inputStyle} 
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            style={inputStyle}
           />
-          
-          <button 
-            type="submit" 
-            disabled={loading} 
+
+          <button
+            type="submit"
+            disabled={loading}
             style={{ width: '100%', padding: '12px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', marginTop: '10px' }}
           >
             {loading ? 'Logging in...' : 'Login'}
@@ -82,19 +104,19 @@ function Login() {
         </form>
 
         <div style={{ marginTop: '15px', fontSize: '14px' }}>
-          Don’t have an account? <Link to="/signup" style={{ color: '#2563eb', fontWeight: 'bold' }}>Sign Up</Link>
+          Don't have an account? <Link to="/signup" style={{ color: '#2563eb', fontWeight: 'bold' }}>Sign Up</Link>
         </div>
       </div>
     </div>
   );
 }
 
-const inputStyle = { 
-  width: '100%', 
-  padding: '10px', 
-  marginBottom: '15px', 
-  borderRadius: '5px', 
-  border: '1px solid #ddd' 
+const inputStyle = {
+  width: '100%',
+  padding: '10px',
+  marginBottom: '15px',
+  borderRadius: '5px',
+  border: '1px solid #ddd'
 };
 
 export default Login;

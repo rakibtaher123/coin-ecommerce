@@ -95,6 +95,9 @@ try {
   // ✅ ✅ ✅ Auction Route যোগ করা হলো
   app.use("/api/auctions", require("./routes/auctionRoute"));
 
+  // ✅ Bid Routes
+  app.use("/api/bids", require("./routes/bidRoute"));
+
   // Optional Feedback
   const feedbackPath = path.join(__dirname, "./routes/feedbackRoutes.js");
   if (fs.existsSync(feedbackPath)) {

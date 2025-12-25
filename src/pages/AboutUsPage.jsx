@@ -11,50 +11,50 @@ function AboutUsPage() {
   return (
     <Box sx={{ backgroundColor: '#e3f2fd', minHeight: '80vh', py: 6 }}>
       <Container maxWidth="lg">
-        
-        <Paper 
-          elevation={5} 
-          sx={{ 
-            p: { xs: 3, md: 6 }, 
-            borderRadius: '12px', 
+
+        <Paper
+          elevation={5}
+          sx={{
+            p: { xs: 3, md: 6 },
+            borderRadius: '12px',
             backgroundColor: 'white',
             border: '1px solid #c8e6c9'
           }}
         >
 
           {/* Header Section */}
-          <Typography 
-            variant="h3" 
-            component="h1" 
-            align="center" 
-            gutterBottom 
+          <Typography
+            variant="h3"
+            component="h1"
+            align="center"
+            gutterBottom
             sx={{ fontWeight: '900', color: '#1b5e20', mb: 1 }}
           >
-            About CoinHouseMarket
+            About Gangaridai Numismatic Gallery(GNG)
           </Typography>
 
-          <Typography 
-            variant="h6" 
-            component="p" 
-            align="center" 
+          <Typography
+            variant="h6"
+            component="p"
+            align="center"
             color="#00695c"
             sx={{ mb: 4, fontStyle: 'italic', fontWeight: '500' }}
           >
             "প্রতিটি মুদ্রা শুধু একটি সংগ্রহ নয়—এটি ইতিহাসের জীবন্ত অংশ।"
           </Typography>
-          
+
           <Divider sx={{ mb: 4 }} />
 
           {/* Introduction */}
           <Typography variant="body1" paragraph sx={{ fontSize: '1.1rem', lineHeight: 1.8 }}>
-            CoinHouseMarket হলো প্রাচীন, বিরল এবং সংগ্রহযোগ্য মুদ্রা কেনা–বেচার জন্য একটি বিশ্বস্ত ও আধুনিক ডিজিটাল মার্কেটপ্লেস।
+            Gangaridai Numismatic Gallery(GNG) হলো প্রাচীন, বিরল এবং সংগ্রহযোগ্য মুদ্রা কেনা–বেচার জন্য একটি বিশ্বস্ত ও আধুনিক ডিজিটাল মার্কেটপ্লেস।
           </Typography>
           <Typography variant="body1" paragraph sx={{ fontSize: '1.1rem', mb: 4 }}>
             আমরা সংগ্রাহকদের এমন একটি নির্ভরযোগ্য প্ল্যাটফর্ম দিচ্ছি যেখানে মুদ্রার সত্যতা, গুণমান ও ঐতিহাসিক মূল্যকে সর্বোচ্চ গুরুত্ব দেওয়া হয়।
           </Typography>
 
           <Grid container spacing={5} alignItems="flex-start">
-            
+
             {/* Left Column: What We Do */}
             <Grid item xs={12} md={6}>
               <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 'bold', color: '#004d40' }}>
@@ -112,7 +112,7 @@ function AboutUsPage() {
 
           {/* Founder Section */}
           <Divider sx={{ my: 6, borderStyle: 'dashed' }} />
-          
+
           <Grid item xs={12} sx={{ textAlign: 'center' }}>
             <Typography variant="h4" component="h2" gutterBottom sx={{ fontWeight: 'bold', color: '#004d40' }}>
               Founder
@@ -127,7 +127,7 @@ function AboutUsPage() {
             />
             <Typography variant="h5" component="h3" sx={{ fontWeight: '600' }}>Rakib</Typography>
             <Typography variant="body1" color="text.secondary" gutterBottom>
-              Founder, CoinHouseMarket
+              Founder, Gangaridai Numismatic Gallery(GNG)
             </Typography>
             <Typography variant="body1" sx={{ maxWidth: '700px', margin: 'auto', mt: 2 }}>
               সংগ্রাহক ও ইতিহাসপ্রেমী Rakib-এর লক্ষ্য ছিল সংগ্রাহকদের জন্য একটি এমন প্ল্যাটফর্ম তৈরি করা যেখানে তারা সহজে, নিরাপদে এবং আস্থার সাথে মুদ্রা সংগ্রহ করতে পারে।

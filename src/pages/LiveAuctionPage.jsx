@@ -4,6 +4,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import TimerIcon from '@mui/icons-material/Timer';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import BiddingModal from '../components/BiddingModal';
 import axios from 'axios';
 
 // ✅ আপনার সার্ভারের ঠিকানা (ব্যাকএন্ড পোর্ট)
@@ -19,6 +20,7 @@ const LiveAuctionPage = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [loading, setLoading] = useState(true); // শুরুতে API call এর জন্য loading
   const [error, setError] = useState(null); // Error tracking
+  const [modalOpen, setModalOpen] = useState(false); // Bidding modal state
 
   // ✅ ইমেজ ফিক্স করার ফাংশন (ম্যাজিক কোড)
   // এটি চেক করবে ইমেজ পাথ লোকাল নাকি অনলাইন এবং সে অনুযায়ী URL ঠিক করবে
@@ -48,7 +50,13 @@ const LiveAuctionPage = () => {
             description: `Category: ${liveAuction.category}. Base Price: ৳${liveAuction.basePrice.toLocaleString()}`,
             image: liveAuction.productImage,
             currentBid: liveAuction.highestBid || liveAuction.basePrice,
-            endTime: new Date(liveAuction.endTime).getTime()
+            endTime: new Date(liveAuction.endTime).getTime(),
+            _id: liveAuction._id,
+            category: liveAuction.category,
+            productName: liveAuction.productName,
+            basePrice: liveAuction.basePrice,
+            highestBid: liveAuction.highestBid || liveAuction.basePrice,
+            totalBids: liveAuction.totalBids || 0
           });
           setError(null);
         } else {
@@ -64,6 +72,13 @@ const LiveAuctionPage = () => {
     };
 
     fetchLiveAuction();
+
+    // ✅ Auto-refresh every 5 seconds for real-time updates
+    const refreshInterval = setInterval(() => {
+      fetchLiveAuction();
+    }, 5000);
+
+    return () => clearInterval(refreshInterval);
   }, []);
 
   // টাইমার লজিক
@@ -93,39 +108,51 @@ const LiveAuctionPage = () => {
   };
 
   const handleBid = () => {
-    // Auto-login with demo user if not logged in (FOR TESTING)
-    if (!isLoggedIn) {
-      console.log('🔓 Auto-login: Creating demo user session...');
-      // Create a demo JWT token
-      const demoUser = {
-        id: 'demo123',
-        email: 'demo@coinhouse.com',
-        name: 'Demo User',
-        role: 'user'
-      };
-      // Simple base64 encoded token (for demo purposes only)
-      const demoToken = btoa(JSON.stringify(demoUser));
-      localStorage.setItem('token', demoToken);
-      localStorage.setItem('userEmail', demoUser.email);
-      localStorage.setItem('userRole', demoUser.role);
-      console.log('✅ Demo user logged in automatically!');
-      // Continue with bid
+    // Check if user is logged in using localStorage directly
+    const token = localStorage.getItem('token');
+    const userEmail = localStorage.getItem('userEmail');
+    const userRole = localStorage.getItem('userRole');
+
+    if (!token || !userEmail) {
+      alert("Please login to place a bid");
+      // ✅ Redirect with return path
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
     }
 
-    if (user?.role === 'admin') {
+    if (userRole === 'admin') {
       alert("❌ Admins cannot bid.");
       return;
     }
 
-    // পেমেন্ট পেজে রিডাইরেক্ট
-    const nextBidAmount = auctionData.currentBid + 500;
-    navigate('/payment', {
-      state: {
-        amount: nextBidAmount,
-        productName: auctionData.name,
-        type: "Auction Bid"
+    // Open bidding modal
+    setModalOpen(true);
+  };
+
+  const handleBidPlaced = async () => {
+    // Refresh auction data after bid is placed
+    try {
+      const { data } = await axios.get(`${API_BASE_URL}/api/auctions`);
+      const liveAuction = data.find(auction => auction.status === 'Live');
+
+      if (liveAuction) {
+        setAuctionData({
+          name: liveAuction.productName,
+          description: `Category: ${liveAuction.category}. Base Price: ৳${liveAuction.basePrice.toLocaleString()}`,
+          image: liveAuction.productImage,
+          currentBid: liveAuction.highestBid || liveAuction.basePrice,
+          endTime: new Date(liveAuction.endTime).getTime(),
+          _id: liveAuction._id,
+          category: liveAuction.category,
+          productName: liveAuction.productName,
+          basePrice: liveAuction.basePrice,
+          highestBid: liveAuction.highestBid || liveAuction.basePrice,
+          totalBids: liveAuction.totalBids || 0
+        });
       }
-    });
+    } catch (error) {
+      console.error('Error refreshing auction:', error);
+    }
   };
 
   return (
@@ -225,16 +252,26 @@ const LiveAuctionPage = () => {
                   disabled={timeLeft === 0}
                   sx={{ py: 1.5, fontWeight: 'bold', fontSize: '1.1rem' }}
                 >
-                  {timeLeft > 0 ? `PAY & PLACE BID (৳ ${(auctionData.currentBid + 500).toLocaleString()})` : "BIDDING CLOSED"}
+                  {timeLeft > 0 ? `PLACE BID` : "BIDDING CLOSED"}
                 </Button>
 
                 <Typography variant="caption" color="text.secondary" align="center">
-                  * Clicking this will redirect you to the secure payment gateway.
+                  * Click to open bidding modal and place your bid securely.
                 </Typography>
               </Box>
             </Paper>
           </Grid>
         </Grid>
+      )}
+
+      {/* Bidding Modal */}
+      {auctionData && (
+        <BiddingModal
+          auction={auctionData}
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onBidPlaced={handleBidPlaced}
+        />
       )}
     </Container>
   );

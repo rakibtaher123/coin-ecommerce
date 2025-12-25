@@ -1,23 +1,23 @@
 import React, { useContext, useState } from 'react'; // useState ইম্পোর্ট করা হয়েছে
 import { AppBar, Toolbar, Typography, Box, IconButton, Badge, InputBase, Button, Menu, MenuItem } from '@mui/material';
-import { ShoppingCart, Search, Person, Logout } from '@mui/icons-material'; 
+import { ShoppingCart, Search, Person, Logout } from '@mui/icons-material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'; // নতুন আইকন
 import { useNavigate } from 'react-router-dom';
 
 // আপনার বিদ্যমান Context ইম্পোর্ট:
-import { useCart } from '../context/CartProvider'; 
+import { useCart } from '../context/CartProvider';
 
 // AuthContext ইম্পোর্ট
-import { AuthContext } from '../context/AuthContext'; 
+import { AuthContext } from '../context/AuthContext';
 
 const Header = () => {
     const navigate = useNavigate();
-    
+
     // Cart Context
-    const { itemCount } = useCart(); 
+    const { itemCount } = useCart();
 
     // Auth Context থেকে স্টেট
-    const { isLoggedIn, logout, user } = useContext(AuthContext); 
+    const { isLoggedIn, logout, user } = useContext(AuthContext);
 
     // Dropdown Menu State
     const [anchorEl, setAnchorEl] = useState(null);
@@ -41,14 +41,14 @@ const Header = () => {
 
     // লগআউট হ্যান্ডলার
     const handleLogout = () => {
-        logout(); 
-        navigate('/'); 
+        logout();
+        navigate('/');
     };
 
     return (
         <AppBar position="sticky" sx={{ bgcolor: '#1b5e20', px: 2 }}>
             <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                
+
                 {/* ✅ LEFT: LOGO & NAVIGATION */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Typography
@@ -56,7 +56,7 @@ const Header = () => {
                         sx={{ fontWeight: 'bold', cursor: 'pointer', mr: 2 }}
                         onClick={() => navigate('/')}
                     >
-                        CoinHouse
+                        GNG
                     </Typography>
 
                     {/* --- Navigation Links (Desktop) --- */}
@@ -86,8 +86,10 @@ const Header = () => {
                                     'aria-labelledby': 'auction-button',
                                 }}
                             >
-                                <MenuItem onClick={() => handleNavigate('/auction/live')}>Live</MenuItem>
+                                <MenuItem onClick={() => handleNavigate('/auction/live')}>E-AuctionHouse</MenuItem>
                                 <MenuItem onClick={() => handleNavigate('/auction/archives')}>Archives</MenuItem>
+                                <MenuItem onClick={() => handleNavigate('/auction/bidding')}>Live Bidding System</MenuItem>
+                                <MenuItem onClick={() => handleNavigate('/auction/bid-history')}>Bid History</MenuItem>
                             </Menu>
                         </div>
                         {/* 🔥 AUCTION DROPDOWN END */}
@@ -126,7 +128,7 @@ const Header = () => {
 
                 {/* ✅ RIGHT: LOGIN/LOGOUT + CART */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    
+
                     <Button
                         color="inherit"
                         onClick={() => navigate('/my-orders')}
@@ -160,7 +162,7 @@ const Header = () => {
                             <Typography variant="body2" sx={{ color: 'white', display: { xs: 'none', md: 'block' }, mx: 1 }}>
                                 {user?.role || 'User'}
                             </Typography>
-                            
+
                             <IconButton color="inherit" onClick={handleLogout} title="Logout">
                                 <Logout />
                             </IconButton>

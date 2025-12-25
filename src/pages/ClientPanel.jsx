@@ -186,10 +186,34 @@ const ClientPanel = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
             <ActionButton
-              title="Live Auctions"
+              title="E-AuctionHouse"
               icon={<Gavel />}
               color="#d32f2f" // Red
-              onClick={() => navigate('/client/auctions')}
+              onClick={() => { window.location.replace('/auction/live'); }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <ActionButton
+              title="Archives"
+              icon={<Gavel />}
+              color="#0288d1" // Blue
+              onClick={() => { window.location.replace('/auction/archives'); }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <ActionButton
+              title="Live Bidding System"
+              icon={<Gavel />}
+              color="#ed6c02" // Orange
+              onClick={() => { window.location.replace('/auction/bidding'); }}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={4}>
+            <ActionButton
+              title="Bid History"
+              icon={<Gavel />}
+              color="#7b1fa2" // Purple
+              onClick={() => { window.location.replace('/auction/bid-history'); }}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>

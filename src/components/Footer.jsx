@@ -24,10 +24,10 @@ const Footer = () => {
     <Box component="footer" sx={{ backgroundColor: '#1b5e20', color: 'white', py: 6, mt: 'auto' }}>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          {/* CoinHouseMarket Info */}
+          {/* Gangaridai Numismatic Gallery(GNG) Info */}
           <Grid item xs={12} md={5}>
             <Typography variant="h6" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
-              CoinHouseMarket
+              GNG
             </Typography>
             <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
               পুরাতন এবং দুষ্প্রাপ্য মুদ্রা কেনার একটি বিশ্বস্ত প্রতিষ্ঠান। আমাদের কালেকশন দেখুন এবং ইতিহাসের একটি অংশ নিজের করে নিন।
@@ -71,7 +71,7 @@ const Footer = () => {
 
         {/* --- Payments Section --- */}
         <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', pt: 4, mt: 5, textAlign: 'center' }}>
-          
+
           <Grid container spacing={4} justifyContent="center">
             {/* 1. Mobile Payments */}
             <Grid item xs={12} md={6}>
@@ -86,9 +86,9 @@ const Footer = () => {
                     boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'transform 0.2s',
                     '&:hover': { transform: 'scale(1.05)' }
                   }}>
-                    <img 
-                      src={icon.url} 
-                      alt={icon.alt} 
+                    <img
+                      src={icon.url}
+                      alt={icon.alt}
                       style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                       onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/AAAAAA/FFFFFF?text=" + icon.name; }}
                     />
@@ -109,9 +109,9 @@ const Footer = () => {
                   boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'transform 0.2s',
                   '&:hover': { transform: 'scale(1.05)' }
                 }}>
-                  <img 
-                    src="/assets/logos/paypal.jpg" 
-                    alt="PayPal" 
+                  <img
+                    src="/assets/logos/paypal.jpg"
+                    alt="PayPal"
                     style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                     onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/003087/FFFFFF?text=PayPal"; }}
                   />
@@ -134,9 +134,9 @@ const Footer = () => {
                 boxShadow: '0 2px 5px rgba(0,0,0,0.2)', transition: 'transform 0.2s',
                 '&:hover': { transform: 'scale(1.05)' }
               }}>
-                <img 
-                  src={icon.url} 
-                  alt={icon.alt} 
+                <img
+                  src={icon.url}
+                  alt={icon.alt}
                   style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                   onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/100x60/AAAAAA/FFFFFF?text=Courier"; }}
                 />
@@ -148,7 +148,7 @@ const Footer = () => {
         {/* Copyright */}
         <Box sx={{ textAlign: 'center', pt: 4, mt: 4, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
           <Typography variant="caption" sx={{ opacity: 0.8 }}>
-            &copy; {new Date().getFullYear()} CoinHouseMarket. All rights reserved.
+            &copy; {new Date().getFullYear()} Gangaridai Numismatic Gallery(GNG). All rights reserved.
           </Typography>
         </Box>
       </Container>

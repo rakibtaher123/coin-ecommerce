@@ -18,14 +18,14 @@ const HomePage = () => {
             try {
                 const { data } = await axios.get(`${API_BASE_URL}/api/products`);
                 console.log("Fetched products:", data);
-                
+
                 // Filter only Mughal, Ancient, Sultan, and Janapada coins
                 const featuredItems = data.filter(product => {
                     const cat = product.category ? product.category.toLowerCase() : "";
-                    return cat.includes('mughal') || 
-                           cat.includes('ancient') || 
-                           cat.includes('sultan') || 
-                           cat.includes('janapada');
+                    return cat.includes('mughal') ||
+                        cat.includes('ancient') ||
+                        cat.includes('sultan') ||
+                        cat.includes('janapada');
                 });
 
                 // If filtered items exist, use them; otherwise, fallback to all data
@@ -43,9 +43,9 @@ const HomePage = () => {
 
     return (
         <Box sx={{ backgroundColor: '#f4f6f8', minHeight: '100vh', pb: 8 }}>
-            
+
             {/* 🔥 Professional Hero Section with NEW COIN IMAGE */}
-            <Box 
+            <Box
                 sx={{
                     // Using professional coin image
                     backgroundImage: 'linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("https://images.unsplash.com/photo-1590138436320-d9661b18470e?q=80&w=2070&auto=format&fit=crop")',
@@ -62,27 +62,27 @@ const HomePage = () => {
                 }}
             >
                 <Container maxWidth="md">
-                    <Typography 
-                        variant="h3" 
-                        fontWeight="bold" 
-                        sx={{ 
-                            fontFamily: 'serif', 
-                            mb: 2, 
+                    <Typography
+                        variant="h3"
+                        fontWeight="bold"
+                        sx={{
+                            fontFamily: 'serif',
+                            mb: 2,
                             textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
                             letterSpacing: '1px'
                         }}
                     >
-                        Welcome to CoinHouseMarket
+                        Welcome to Gangaridai Numismatic Gallery(GNG)
                     </Typography>
-                    <Typography 
-                        variant="h6" 
+                    <Typography
+                        variant="h6"
                         sx={{ mb: 1, color: '#e0e0e0', letterSpacing: 2, textTransform: 'uppercase', fontSize: '0.9rem' }}
                     >
                         Made By Rakib
                     </Typography>
                     <Box sx={{ width: '60px', height: '3px', bgcolor: '#f9a825', mx: 'auto', my: 3 }}></Box>
-                    <Typography 
-                        variant="h5" 
+                    <Typography
+                        variant="h5"
                         sx={{ mt: 3, fontStyle: 'italic', color: '#ffecb3', fontWeight: 'light' }}
                     >
                         "Discover the Legacy of History – One Coin at a Time."
@@ -92,7 +92,7 @@ const HomePage = () => {
 
             {/* Featured Products Grid */}
             <Container maxWidth="lg">
-                
+
                 {loading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
                         <CircularProgress color="success" />
@@ -101,7 +101,7 @@ const HomePage = () => {
                     <Grid container spacing={4} justifyContent="center">
                         {products.length > 0 ? (
                             products.map((product) => (
-                                <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}> 
+                                <Grid item key={product._id} xs={12} sm={6} md={4} lg={3}>
                                     <ProductCard product={product} />
                                 </Grid>
                             ))
