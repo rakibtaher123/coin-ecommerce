@@ -48,7 +48,7 @@ const ManageProducts = () => {
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/products');
+      const res = await fetch('/api/products');
       const data = await res.json();
       setProducts(data);
     } catch (error) {
@@ -107,7 +107,7 @@ const ManageProducts = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch('/api/products', {
         method: 'POST',
         body: formData,
       });
@@ -131,7 +131,7 @@ const ManageProducts = () => {
     if (!window.confirm(`Delete "${productName}"?`)) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/products/${id}`, {
+      const response = await fetch(`/api/products/${id}`, {
         method: 'DELETE',
       });
 
@@ -222,7 +222,7 @@ const ManageProducts = () => {
 
                         {/* Product Image */}
                         <Avatar
-                          src={`http://localhost:5000${product.image}`}
+                          src={product.image}
                           variant="rounded"
                           sx={{ width: '100%', height: 120, mb: 2 }}
                         />

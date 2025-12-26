@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 
 // কম্পোনেন্ট ইম্পোর্ট
 import Navbar from './components/Navbar';
@@ -28,6 +28,7 @@ import ClientPanel from './pages/ClientPanel';
 import PaymentPage from './pages/PaymentPage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentFailedPage from './pages/PaymentFailedPage';
+import PaymentConfirm from './pages/PaymentConfirm'; // Import PaymentConfirm
 
 // Client Dashboard Pages
 import ClientProductsPage from './pages/ClientProductsPage';
@@ -51,6 +52,8 @@ import ViewOrders from './Admin/pages/ViewOrders';         // নতুন
 import ManageUsers from './Admin/pages/ManageUsers';       // নতুন
 import SiteSettings from './Admin/pages/SiteSettings';     // নতুন
 import FeedbackPage from './Admin/pages/FeedbackPage';     // নতুন (ফাইলের নাম চেক করে নিও FeedbackPage.jsx নাকি ViewFeedback.jsx)
+
+import PrivateRoute from './PrivateRoute';
 
 function App() {
     const location = useLocation();
@@ -79,7 +82,27 @@ function App() {
                     <Route path="/product/:id" element={<ProductPage />} />
                     <Route path="/cart" element={<CartPage />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
-                    <Route path="/payment" element={<PaymentPage />} />
+
+                    {/* ✅ New Payment Confirmation Route */}
+                    <Route
+                        path="/client/payment"
+                        element={
+                            <PrivateRoute>
+                                <PaymentConfirm />
+                            </PrivateRoute>
+                        }
+                    />
+
+                    {/* Legacy/Fallback Payment Route if needed */}
+                    <Route
+                        path="/payment"
+                        element={
+                            <PrivateRoute>
+                                <PaymentPage />
+                            </PrivateRoute>
+                        }
+                    />
+
                     <Route path="/payment-success" element={<PaymentSuccessPage />} />
                     <Route path="/payment-failed" element={<PaymentFailedPage />} />
                     <Route path="/login" element={<LoginPage />} />
@@ -89,6 +112,7 @@ function App() {
                     <Route path="/notifications" element={<NotificationsPage />} />
 
                     {/* --- অকশন রাউটস (ইউজারদের জন্য) --- */}
+                    <Route path="/auction" element={<Navigate to="/auction/live" replace />} />
                     <Route path="/auction/live" element={<LiveAuctionPage />} />
                     <Route path="/auction/archives" element={<ArchivesPage />} />
                     <Route path="/auction/bidding" element={<LiveBiddingPage />} />
@@ -99,6 +123,9 @@ function App() {
                     <Route path="/client/products" element={<ClientProductsPage />} />
                     <Route path="/client/orders" element={<ClientOrdersPage />} />
                     <Route path="/client/settings" element={<ClientSettingsPage />} />
+                    <Route path="/client/profile" element={<ClientSettingsPage />} />       {/* Alias for Profile Settings */}
+                    <Route path="/client/bid-history" element={<BidHistoryPage />} />       {/* Alias for Bid History */}
+                    <Route path="/client/auction/live" element={<LiveAuctionPage />} />     {/* Alias for Live Auction */}
                     <Route path="/client/address" element={<ClientAddressPage />} />
                     <Route path="/client/payments" element={<ClientPaymentsPage />} />
                     <Route path="/client/auctions" element={<ClientAuctionsPage />} />

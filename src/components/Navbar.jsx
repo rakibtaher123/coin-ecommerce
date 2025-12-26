@@ -46,7 +46,7 @@ const Navbar = () => {
   const isAdmin = isLoggedIn && (user?.email === 'admin@gmail.com' || user?.role === 'admin');
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: '#1b5e20' }}>
+    <AppBar position="sticky" sx={{ backgroundColor: '#004D40' }}>
       <Toolbar>
 
         {/* LOGO */}

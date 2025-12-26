@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Box, Grid, Paper, Typography, Button, Container, CircularProgress,
-  Card, CardContent
+  Card, CardContent, IconButton
 } from '@mui/material';
 import {
   ShoppingBag, AttachMoney, HourglassEmpty, CheckCircle,
-  Gavel, Settings, Logout, AccountCircle, LocationOn, Payment
+  Gavel, Logout, AccountCircle, LocationOn, Payment, ArrowBack
 } from '@mui/icons-material';
+
+// Import sub-pages
+import LiveBiddingPage from './LiveBiddingPage';
+import ArchivesPage from './ArchivesPage';
+import BidHistoryPage from './BidHistoryPage';
 
 const ClientPanel = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   // User & Stats State
-  const [userName, setUserName] = useState('Valued Customer');
   const [userEmail, setUserEmail] = useState('');
   const [stats, setStats] = useState({
     totalOrders: 0,
@@ -24,14 +28,12 @@ const ClientPanel = () => {
   });
 
   useEffect(() => {
-    // Check authentication
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
 
-    // Get user info
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       setUserEmail(payload.email || '');
@@ -39,7 +41,6 @@ const ClientPanel = () => {
       console.error('Error parsing token:', err);
     }
 
-    // In real app, fetch user data and stats from backend
     setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -52,7 +53,6 @@ const ClientPanel = () => {
     navigate('/login');
   };
 
-  // Stat Card Component (matching admin style)
   const StatCard = ({ title, value, icon, color, subText }) => (
     <Paper elevation={3} sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%', borderRadius: 2 }}>
       <Box>
@@ -72,7 +72,6 @@ const ClientPanel = () => {
     </Paper>
   );
 
-  // Action Button Component (matching admin style)
   const ActionButton = ({ title, icon, color, onClick }) => (
     <Card
       onClick={onClick}
@@ -105,6 +104,8 @@ const ClientPanel = () => {
       </Box>
     );
   }
+
+
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f4f6f8', pb: 8 }}>
@@ -181,7 +182,7 @@ const ClientPanel = () => {
               title="Browse Products"
               icon={<ShoppingBag />}
               color="#1976d2" // Blue
-              onClick={() => navigate('/client/products')}
+              onClick={() => navigate('/all-products')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -189,7 +190,7 @@ const ClientPanel = () => {
               title="E-AuctionHouse"
               icon={<Gavel />}
               color="#d32f2f" // Red
-              onClick={() => { window.location.replace('/auction/live'); }}
+              onClick={() => navigate('/auction')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -197,7 +198,7 @@ const ClientPanel = () => {
               title="Archives"
               icon={<Gavel />}
               color="#0288d1" // Blue
-              onClick={() => { window.location.replace('/auction/archives'); }}
+              onClick={() => navigate('/auction/archives')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -205,7 +206,7 @@ const ClientPanel = () => {
               title="Live Bidding System"
               icon={<Gavel />}
               color="#ed6c02" // Orange
-              onClick={() => { window.location.replace('/auction/bidding'); }}
+              onClick={() => navigate('/auction/live')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -213,7 +214,7 @@ const ClientPanel = () => {
               title="Bid History"
               icon={<Gavel />}
               color="#7b1fa2" // Purple
-              onClick={() => { window.location.replace('/auction/bid-history'); }}
+              onClick={() => navigate('/client/bid-history')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>
@@ -229,7 +230,7 @@ const ClientPanel = () => {
               title="Profile Settings"
               icon={<AccountCircle />}
               color="#7b1fa2" // Purple
-              onClick={() => navigate('/client/settings')}
+              onClick={() => navigate('/client/profile')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={4}>

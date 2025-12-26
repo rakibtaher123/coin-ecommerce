@@ -33,7 +33,13 @@ function Login() {
         console.log('Redirect parameter:', redirectTo);
 
         // ✅ Check for redirect parameter first, then role-based redirect
-        if (redirectTo) {
+        // ✅ Check for redirect parameter first, then role-based redirect
+        const fromState = location.state?.from;
+
+        if (fromState) {
+          console.log('Redirecting to state.from:', fromState);
+          navigate(fromState, { replace: true });
+        } else if (redirectTo) {
           // Decode the redirect URL (in case it's URL encoded)
           let decodedPath = decodeURIComponent(redirectTo);
           console.log('Decoded redirect path:', decodedPath);

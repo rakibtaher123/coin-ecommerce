@@ -33,7 +33,7 @@ app.use(cors(corsOptions));
 app.use(express.json());
 
 // ✅ 3. Static Assets
-const assetsPath = path.resolve(__dirname, '../public/assets');
+const assetsPath = path.join(__dirname, 'public/assets');
 if (fs.existsSync(assetsPath)) {
   app.use('/assets', express.static(assetsPath));
 }

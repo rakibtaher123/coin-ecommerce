@@ -115,8 +115,8 @@ const LiveAuctionPage = () => {
 
     if (!token || !userEmail) {
       alert("Please login to place a bid");
-      // ✅ Redirect with return path
-      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      // ✅ Redirect with return path using state
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
 

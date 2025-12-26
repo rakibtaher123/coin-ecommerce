@@ -134,6 +134,15 @@ function CheckoutPage() {
       return;
     }
 
+    // Check strict auth
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert("You must be logged in to proceed!");
+      navigate('/login', { state: { from: '/client/payment' } });
+      return;
+    }
+
     // Save checkout info to localStorage for payment page
     const checkoutData = {
       shippingInfo,
@@ -144,15 +153,8 @@ function CheckoutPage() {
     };
     localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
 
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // Redirect to login with payment redirect
-      navigate('/login?redirect=payment');
-    } else {
-      // Navigate directly to payment page
-      navigate('/payment');
-    }
+    // Navigate directly to payment page
+    navigate('/client/payment');
   };
 
   // বাটন স্টাইল

@@ -2,22 +2,31 @@ const mongoose = require("mongoose");
 
 const auctionSchema = new mongoose.Schema(
   {
-    productName: { type: String, required: true },
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+    // Keeping snapshot fields for quick display without population
+    productName: { type: String },
     productImage: { type: String },
     category: { type: String },
-    basePrice: { type: Number, required: true },
-    highestBid: { type: Number, default: 0 },
-    totalBids: { type: Number, default: 0 },
-    bids: [{
-      userId: { type: String },
-      userEmail: { type: String, required: true },
-      userName: { type: String },
-      amount: { type: Number, required: true },
-      timestamp: { type: Date, default: Date.now }
-    }],
+
     startTime: { type: Date, required: true },
     endTime: { type: Date, required: true },
-    status: { type: String, default: "Upcoming" }
+    startingPrice: { type: Number, required: true },
+    currentPrice: { type: Number, default: function () { return this.startingPrice; } },
+
+    highestBidder: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    winner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+
+    bids: [{
+      user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      amount: { type: Number, required: true },
+      time: { type: Date, default: Date.now }
+    }],
+
+    status: {
+      type: String,
+      enum: ['active', 'closed'],
+      default: 'active'
+    }
   },
   { timestamps: true }
 );

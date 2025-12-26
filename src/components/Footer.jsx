@@ -21,12 +21,12 @@ const COURIER_ICONS = [
 
 const Footer = () => {
   return (
-    <Box component="footer" sx={{ backgroundColor: '#1b5e20', color: 'white', py: 6, mt: 'auto' }}>
+    <Box component="footer" sx={{ backgroundColor: '#00251a', color: 'white', py: 6, mt: 'auto' }}>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
           {/* Gangaridai Numismatic Gallery(GNG) Info */}
           <Grid item xs={12} md={5}>
-            <Typography variant="h6" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#D4AF37', fontWeight: 'bold' }}>
               GNG
             </Typography>
             <Typography variant="body2" sx={{ mb: 2, lineHeight: 1.8 }}>
@@ -36,7 +36,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <Grid item xs={12} sm={6} md={3}>
-            <Typography variant="h6" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#D4AF37', fontWeight: 'bold' }}>
               Quick Links
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -49,7 +49,7 @@ const Footer = () => {
 
           {/* Contact Info */}
           <Grid item xs={12} sm={6} md={4}>
-            <Typography variant="h6" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#D4AF37', fontWeight: 'bold' }}>
               Contact Us
             </Typography>
             <Typography variant="body2" paragraph>
@@ -75,7 +75,7 @@ const Footer = () => {
           <Grid container spacing={4} justifyContent="center">
             {/* 1. Mobile Payments */}
             <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+              <Typography variant="subtitle1" gutterBottom sx={{ color: '#D4AF37', fontWeight: 'bold' }}>
                 Secured Mobile Payments
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
@@ -99,7 +99,7 @@ const Footer = () => {
 
             {/* 2. Global & PayPal */}
             <Grid item xs={12} md={6}>
-              <Typography variant="subtitle1" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+              <Typography variant="subtitle1" gutterBottom sx={{ color: '#D4AF37', fontWeight: 'bold' }}>
                 Global & Local Payments
               </Typography>
               <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
@@ -123,7 +123,7 @@ const Footer = () => {
 
         {/* --- Courier Section --- */}
         <Box sx={{ pt: 4, mt: 0, textAlign: 'center' }}>
-          <Typography variant="subtitle1" gutterBottom sx={{ color: '#c8e6c9', fontWeight: 'bold' }}>
+          <Typography variant="subtitle1" gutterBottom sx={{ color: '#D4AF37', fontWeight: 'bold' }}>
             Reliable Delivery Partners
           </Typography>
           <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>

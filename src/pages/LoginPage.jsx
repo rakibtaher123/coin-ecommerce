@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 const LoginPage = () => {
@@ -8,10 +8,21 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Get redirect URL from query params
+  // Redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      // Retrieve role to redirect correctly
+      const role = localStorage.getItem('userRole');
+      const target = role === 'admin' ? '/admin' : '/client';
+      navigate(target, { replace: true });
+    }
+  }, [navigate]);
+
+  // Get redirect URL from query params or state
   const searchParams = new URLSearchParams(location.search);
-  const redirectTo = searchParams.get('redirect') || 'client';
-  const showPayment = searchParams.get('showPayment');
+  const fromState = location.state?.from;
+  const redirectTo = searchParams.get('redirect');
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -22,7 +33,7 @@ const LoginPage = () => {
       localStorage.setItem("isAdminLoggedIn", "true");
       localStorage.setItem("userRole", "admin");
       console.log("Welcome Admin!");
-      window.location.href = "/admin";
+      window.location.href = "/admin"; // Force reload for admin
       return;
     }
 
@@ -39,24 +50,29 @@ const LoginPage = () => {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         localStorage.setItem("userRole", data.user.role);
+        localStorage.setItem("userEmail", data.user.email || email);
         console.log("Login Successful!");
 
         if (data.user.role === "admin") {
-          navigate("/admin");
+          navigate("/admin", { replace: true });
         } else {
-          // Redirect to specified page or default to client dashboard
-          if (redirectTo === 'payment') {
-            console.log('Redirecting to payment page');
-            navigate('/payment');
-          } else {
-            const redirectPath = redirectTo || 'client';
-            console.log('Redirecting to:', `/${redirectPath}`);
-            navigate(`/${redirectPath}`);
-          }
+
+          // Debugging log
+          console.log("Redirecting to:", fromState);
+
+          // Force navigation logic
+          const target = fromState || '/client';
+          navigate(target, { replace: true });
+
+          // We need to reload to ensure AuthContext picks up the new token immediately
+          // preventing PrivateRoute from kicking the user back
+          window.location.reload();
         }
+        // Reload to update AuthContext state if strictly adhering to context sync
+        // But since we navigate, the persistence logic in AuthContext will pick it up on next mount/render if used
+        window.location.reload();
       } else {
         setError(data.message || "Invalid Email or Password!");
-        console.log(data.message || "Invalid Email or Password!");
       }
     } catch (error) {
       console.error("Login error:", error);

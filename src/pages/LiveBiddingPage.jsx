@@ -1,152 +1,192 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Container,
-    Typography,
-    Box,
-    Grid,
-    Paper,
-    Chip,
-    Button,
-    CircularProgress
+    Container, Typography, Box, Grid, Paper, Chip, Button,
+    CircularProgress, TextField, InputAdornment, Alert, IconButton
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import GavelIcon from '@mui/icons-material/Gavel';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-
-const API_BASE_URL = "http://localhost:5000";
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 const LiveBiddingPage = () => {
     const navigate = useNavigate();
-    const [liveAuctions, setLiveAuctions] = useState([]);
+    const location = useLocation();
+    const [auctions, setAuctions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [bidAmounts, setBidAmounts] = useState({}); // Store input for each auction
+    const [error, setError] = useState(null);
+    const [successMsg, setSuccessMsg] = useState(null);
 
-    useEffect(() => {
-        fetchLiveAuctions();
-        // Auto-refresh every 10 seconds
-        const interval = setInterval(fetchLiveAuctions, 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchLiveAuctions = async () => {
+    // Fetch auctions
+    const fetchAuctions = async () => {
         try {
-            const { data } = await axios.get(`${API_BASE_URL}/api/auctions`);
-            const live = data.filter(auction => auction.status === 'Live');
-            setLiveAuctions(live);
+            const { data } = await axios.get('/api/auctions');
+            // Filter active auctions (handling both 'active' and 'Live' for compatibility)
+            const active = data.filter(a => ['active', 'live'].includes(a.status.toLowerCase()));
+            setAuctions(active);
             setLoading(false);
-        } catch (error) {
-            console.error('Error fetching live auctions:', error);
+        } catch (err) {
+            console.error(err);
             setLoading(false);
         }
     };
 
-    const getImageUrl = (imagePath) => {
-        if (!imagePath) return '/assets/default-coin.jpg';
-        if (imagePath.startsWith('http')) return imagePath;
-        return `${API_BASE_URL}${imagePath}`;
+    useEffect(() => {
+        fetchAuctions();
+        const interval = setInterval(fetchAuctions, 5000); // Poll every 5s
+        return () => clearInterval(interval);
+    }, []);
+
+    // Handle Bid Input Change
+    const handleBidChange = (auctionId, value) => {
+        setBidAmounts(prev => ({ ...prev, [auctionId]: value }));
     };
 
-    if (loading) {
+    // Place Bid Handler
+    const handlePlaceBid = async (auctionId, currentPrice) => {
+        const amount = parseFloat(bidAmounts[auctionId]);
+
+        if (!amount || amount <= currentPrice) {
+            setError(`Bid must be higher than ৳${currentPrice}`);
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            // Redirect to login with return path
+            navigate('/login', { state: { from: location.pathname } });
+            return;
+        }
+
+        try {
+            setError(null);
+            await axios.post('/api/auctions/bid',
+                { auctionId, bidAmount: amount },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setSuccessMsg("✅ Bid Placed Successfully!");
+            setBidAmounts(prev => ({ ...prev, [auctionId]: '' })); // Clear input
+            fetchAuctions(); // Refresh data immediately
+
+            // Clear success msg
+            setTimeout(() => setSuccessMsg(null), 3000);
+
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.error || "Failed to place bid");
+        }
+    };
+
+    // Countdown Renderer
+    const Countdown = ({ endTime }) => {
+        const [timeLeft, setTimeLeft] = useState("");
+
+        useEffect(() => {
+            const calculateTime = () => {
+                const diff = new Date(endTime) - new Date();
+                if (diff <= 0) {
+                    setTimeLeft("Auction Ended");
+                    return;
+                }
+                const hours = Math.floor((diff / (1000 * 60 * 60)));
+                const minutes = Math.floor((diff / (1000 * 60)) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+                setTimeLeft(`${hours}h ${minutes}m ${seconds}s`);
+            };
+            calculateTime();
+            const timer = setInterval(calculateTime, 1000);
+            return () => clearInterval(timer);
+        }, [endTime]);
+
         return (
-            <Container maxWidth="lg" sx={{ py: 5, textAlign: 'center' }}>
-                <CircularProgress size={60} />
-            </Container>
+            <Chip
+                icon={<AccessTimeIcon />}
+                label={timeLeft}
+                color={timeLeft === "Auction Ended" ? "default" : "warning"}
+                size="small"
+            />
         );
-    }
+    };
+
+    if (loading) return (
+        <Container sx={{ py: 10, textAlign: 'center' }}>
+            <CircularProgress />
+        </Container>
+    );
 
     return (
         <Container maxWidth="lg" sx={{ py: 5 }}>
             <Box sx={{ textAlign: 'center', mb: 4 }}>
                 <Typography variant="h4" fontWeight="bold" color="error" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
-                    🔴 Live Bidding System
+                    🔴 Live Auctions
                 </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
-                    Join live auctions and place your bids!
+                <Typography variant="body1" color="text.secondary">
+                    Join ongoing auctions and win exclusive items!
                 </Typography>
             </Box>
 
-            {liveAuctions.length === 0 ? (
-                <Paper sx={{ p: 5, textAlign: 'center' }}>
-                    <GavelIcon sx={{ fontSize: 80, color: '#bdbdbd', mb: 2 }} />
-                    <Typography variant="h5" color="text.secondary" gutterBottom>
-                        No Live Auctions
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        There are currently no active auctions. Check back later!
-                    </Typography>
+            {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+            {successMsg && <Alert severity="success" sx={{ mb: 2 }}>{successMsg}</Alert>}
+
+            {auctions.length === 0 ? (
+                <Paper sx={{ p: 5, textAlign: 'center', bgcolor: '#f9f9f9' }}>
+                    <GavelIcon sx={{ fontSize: 60, color: '#ccc', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary">No Active Auctions</Typography>
                 </Paper>
             ) : (
                 <Grid container spacing={3}>
-                    {liveAuctions.map((auction) => (
+                    {auctions.map((auction) => (
                         <Grid item xs={12} sm={6} md={4} key={auction._id}>
-                            <Paper
-                                sx={{
-                                    p: 2,
-                                    height: '100%',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    transition: 'transform 0.2s',
-                                    '&:hover': { transform: 'translateY(-5px)', boxShadow: 6 }
-                                }}
-                            >
+                            <Paper sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+                                {/* Image */}
                                 <Box sx={{ position: 'relative', mb: 2 }}>
-                                    <Chip
-                                        label="● LIVE"
-                                        color="error"
-                                        size="small"
-                                        sx={{ position: 'absolute', top: 10, right: 10, fontWeight: 'bold' }}
-                                    />
+                                    <Countdown endTime={auction.endTime} />
                                     <img
-                                        src={getImageUrl(auction.productImage)}
+                                        src={auction.productImage || '/assets/default-coin.jpg'}
                                         alt={auction.productName}
-                                        style={{
-                                            width: '100%',
-                                            height: 200,
-                                            objectFit: 'cover',
-                                            borderRadius: 8
+                                        style={{ width: '100%', height: 200, objectFit: 'cover', borderRadius: 8, marginTop: 10 }}
+                                    />
+                                </Box>
+
+                                {/* Info */}
+                                <Typography variant="h6" fontWeight="bold" noWrap>{auction.productName}</Typography>
+                                <Typography variant="body2" color="text.secondary">{auction.category}</Typography>
+
+                                <Box sx={{ my: 2, p: 2, bgcolor: '#e3f2fd', borderRadius: 2 }}>
+                                    <Typography variant="body2" color="text.secondary">Current Price</Typography>
+                                    <Typography variant="h5" color="primary" fontWeight="bold">
+                                        ৳{auction.currentPrice.toLocaleString()}
+                                    </Typography>
+                                    {auction.highestBidder && (
+                                        <Typography variant="caption" color="success.main" fontWeight="bold">
+                                            Last Bidder: {auction.highestBidder?.name || "User"}
+                                        </Typography>
+                                    )}
+                                </Box>
+
+                                {/* Bid Input */}
+                                <Box sx={{ mt: 'auto', display: 'flex', gap: 1 }}>
+                                    <TextField
+                                        label="Amount"
+                                        type="number"
+                                        size="small"
+                                        fullWidth
+                                        value={bidAmounts[auction._id] || ''}
+                                        onChange={(e) => handleBidChange(auction._id, e.target.value)}
+                                        InputProps={{
+                                            startAdornment: <InputAdornment position="start">৳</InputAdornment>,
                                         }}
                                     />
+                                    <Button
+                                        variant="contained"
+                                        color="error"
+                                        onClick={() => handlePlaceBid(auction._id, auction.currentPrice)}
+                                    >
+                                        Bid
+                                    </Button>
                                 </Box>
-
-                                <Typography variant="h6" fontWeight="bold" gutterBottom noWrap>
-                                    {auction.productName}
-                                </Typography>
-
-                                <Typography variant="body2" color="text.secondary" gutterBottom>
-                                    {auction.category}
-                                </Typography>
-
-                                <Box sx={{ flexGrow: 1, my: 2 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        Current Bid:
-                                    </Typography>
-                                    <Typography variant="h5" color="primary" fontWeight="bold">
-                                        ৳{(auction.highestBid || auction.basePrice).toLocaleString()}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary">
-                                        {auction.totalBids || 0} bids placed
-                                    </Typography>
-                                </Box>
-
-                                {auction.endTime && (
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                                        <AccessTimeIcon fontSize="small" color="action" />
-                                        <Typography variant="caption" color="text.secondary">
-                                            Ends: {new Date(auction.endTime).toLocaleString()}
-                                        </Typography>
-                                    </Box>
-                                )}
-
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color="success"
-                                    startIcon={<GavelIcon />}
-                                    onClick={() => navigate(`/auction/live`)}
-                                    sx={{ fontWeight: 'bold' }}
-                                >
-                                    Join Auction
-                                </Button>
                             </Paper>
                         </Grid>
                     ))}

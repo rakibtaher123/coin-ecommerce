@@ -5,7 +5,7 @@ const path = require('path');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         // ছবিগুলো যেখানে সেভ হবে
-        cb(null, 'public/assets'); 
+        cb(null, path.join(__dirname, '../public/assets'));
     },
     filename: (req, file, cb) => {
         // ফাইলের নাম ইউনিক করা (timestamp + original name)
@@ -26,7 +26,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     limits: { fileSize: 5 * 1024 * 1024 }, // Max 5MB
     fileFilter: fileFilter

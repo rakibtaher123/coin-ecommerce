@@ -7,11 +7,16 @@ export default defineConfig({
   server: {
     port: 5173, // Frontend Port
     open: true, // Browser auto-open
-    
+
     // ✅ গুরত্বপূর্ণ: ব্যাকএন্ডের সাথে কানেক্ট করার জন্য Proxy সেটআপ
     proxy: {
       '/api': {
-        target: 'http://localhost:5000', // তোমার ব্যাকএন্ড সার্ভারের পোর্ট
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/assets': {
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },
