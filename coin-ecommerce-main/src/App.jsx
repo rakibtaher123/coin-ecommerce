@@ -6,7 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 // ক্লায়েন্ট পেজ ইম্পোর্ট
-import HomePage from './pages/HomePage';
+import HomePage from './pages/Homepage';
 import AboutUsPage from './pages/AboutUsPage';
 import ContactUsPage from './pages/ContactUsPage';
 import EshopPage from './pages/EshopPage';
