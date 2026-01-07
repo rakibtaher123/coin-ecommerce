@@ -23,7 +23,7 @@ const LoginPage = () => {
   }, [navigate]);
 
   // আগের পেজের লোকেশন খুঁজে বের করা
-  const fromPath = location.state?.from?.pathname || location.state?.from || '/client';
+  const fromPath = location.state?.from?.pathname || location.state?.from || null;
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -50,8 +50,8 @@ const LoginPage = () => {
         if (data.user.role === "admin") {
           navigate("/admin", { replace: true });
         } else {
-          // Check if 'fromPath' is a string or an object (just in case)
-          const targetPath = typeof fromPath === 'string' ? fromPath : '/client';
+          // fromPath থাকলে সেখানে যাবে, না থাকলে /client এ যাবে
+          const targetPath = fromPath || '/client';
           navigate(targetPath, { replace: true });
         }
       }
@@ -114,7 +114,7 @@ const LoginPage = () => {
         </form>
 
         <div style={styles.footer}>
-          Don't have an account? <Link to="/register" style={styles.link}>Sign Up Here</Link>
+          Don't have an account? <Link to="/register" state={{ from: fromPath }} style={styles.link}>Sign Up Here</Link>
         </div>
       </div>
     </div>

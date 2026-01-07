@@ -8,6 +8,7 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import PaymentIcon from '@mui/icons-material/Payment';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartProvider';
 
@@ -37,6 +38,8 @@ function CheckoutPage() {
   const [openLoginDialog, setOpenLoginDialog] = useState(false);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
+  const [isOrderConfirmed, setIsOrderConfirmed] = useState(false); // ✅ অর্ডার কনফার্ম হয়েছে কিনা
+
   // ✅ ইমেজ ফিক্স করার ফাংশন
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://via.placeholder.com/150';
@@ -56,93 +59,82 @@ function CheckoutPage() {
     courier &&
     paymentMethod;
 
-  // ✅ অর্ডার সাবমিট ফাংশন (Backend API সহ)
-  const handlePlaceOrder = async () => {
+  // ✅ ১. অর্ডার কনফার্ম ফাংশন (DB তে সেভ করবে, ড্যাশবোর্ড আপডেট হবে)
+  const handleConfirmOrder = async () => {
     if (cartItems.length === 0) {
       alert("Your cart is empty!");
-      navigate('/');
+      navigate('/client');
       return;
     }
 
-    // ১. লগইন চেক (অপশনাল, তবে ভালো প্র্যাকটিস)
-    const userInfo = localStorage.getItem('userInfo') ? JSON.parse(localStorage.getItem('userInfo')) : null;
-
-    // যদি লগইন ছাড়া অর্ডার নিতে না চান, তবে নিচের ৩ লাইন আন-কমেন্ট করুন
-    /* if (!userInfo) {
-       setOpenLoginDialog(true);
-       return;
-    } */
-
     setIsPlacingOrder(true);
 
-    // ২. অর্ডারের ডাটা সাজানো
+    // অর্ডারের ডাটা সাজানো
     const orderData = {
       orderItems: cartItems.map(item => ({
         name: item.name,
         qty: item.qty,
-        image: item.image,
+        image: item.image || '/placeholder.jpg',
         price: item.price,
-        product: item._id // প্রোডাক্টের আইডি
+        product: item._id || item.product || '000000000000000000000000'
       })),
-      shippingAddress: shippingInfo,
-      paymentMethod: paymentMethod,
+      shippingAddress: {
+        address: shippingInfo.address || 'Not Provided',
+        city: shippingInfo.city || 'Dhaka',
+        postalCode: '1200',
+        country: 'Bangladesh'
+      },
+      paymentMethod: paymentMethod || 'cod',
       itemsPrice: totalPrice,
-      shippingPrice: 0, // ফ্রি শিপিং
+      taxPrice: 0,
+      shippingPrice: 0,
       totalPrice: totalPrice,
-      user: userInfo ? userInfo._id : null // ইউজার থাকলে তার আইডি, না থাকলে নাল
+      isPaid: false, // পেমেন্ট পরে হবে
+      status: 'Pending' // স্ট্যাটাস পেন্ডিং
     };
 
     try {
-      // ৩. ডাটাবেসে পাঠানো (API Call)
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("Please login to confirmation order!");
+        navigate('/login', { state: { from: '/client/checkout' } });
+        return;
+      }
+
       const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // টোকেন থাকলে পাঠাতে পারেন: 'Authorization': `Bearer ${userInfo.token}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(orderData),
       });
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Order Created:', data);
+        console.log('Order Confirmed in DB:', data);
 
-        alert(`🎉 Order Placed Successfully!\nOrder ID: ${data._id}\nTotal: ৳${totalPrice.toLocaleString()}`);
+        // ✅ সাকসেস লজিক
+        setIsOrderConfirmed(true);
+        alert(`✅ Order Confirmed Successfully!\nNow proceed to payment.`);
 
-        clearCart(); // কার্ট খালি করা
-        navigate('/'); // হোমপেজে ফেরত যাওয়া
+        // ড্যাশবোর্ডের জন্য আমরা এখানে কার্ট ক্লিয়ার করছি না, পেমেন্ট পেজ থেকে হ্যান্ডেল করা হবে
+        // অথবা যদি চান কার্ট ক্লিয়ার হোক: clearCart();
+        // কিন্তু পেমেন্ট পেজে আইটেম দেখানোর জন্য এখন রাখছি
       } else {
-        throw new Error('Order submission failed');
+        throw new Error('Order confirmation failed');
       }
 
     } catch (error) {
-      console.error("Error placing order:", error);
-      // ব্যাকএন্ড কানেক্ট না থাকলে লোকাল সাকসেস দেখাবে (টেস্টিংয়ের জন্য)
-      alert("Order Placed Locally (Server might be offline)!");
-      clearCart();
-      navigate('/');
+      console.error("Error confirming order:", error);
+      alert("Failed to confirm order. Please try again.");
     } finally {
       setIsPlacingOrder(false);
     }
   };
 
-  // ✅ Proceed to Payment - Check login first
+  // ✅ ২. পেমেন্টে যাওয়ার ফাংশন
   const handleProceedToPayment = () => {
-    if (cartItems.length === 0) {
-      alert("Your cart is empty!");
-      navigate('/');
-      return;
-    }
-
-    // Check strict auth
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-      alert("You must be logged in to proceed!");
-      navigate('/login', { state: { from: '/client/payment' } });
-      return;
-    }
-
     // Save checkout info to localStorage for payment page
     const checkoutData = {
       shippingInfo,
@@ -157,7 +149,6 @@ function CheckoutPage() {
     navigate('/client/payment');
   };
 
-  // বাটন স্টাইল
   const getSelectableButtonStyle = (isSelected) => ({
     width: '100%',
     justifyContent: 'space-between',
@@ -179,6 +170,30 @@ function CheckoutPage() {
 
   return (
     <Box sx={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+
+      {/* Back to Client Dashboard Button */}
+      <Box sx={{ maxWidth: 'xl', mx: 'auto', mb: 2 }}>
+        <Button
+          variant="contained"
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate('/client')}
+          sx={{
+            backgroundColor: '#1e3a5f',
+            color: 'white',
+            fontWeight: '600',
+            px: 3,
+            py: 1.2,
+            borderRadius: '8px',
+            textTransform: 'none',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            '&:hover': {
+              backgroundColor: '#2d4a6f',
+            }
+          }}
+        >
+          Back to Client Dashboard
+        </Button>
+      </Box>
 
       <Typography variant="h4" fontWeight="bold" sx={{ mb: 4, color: '#1b5e20', textAlign: 'center' }}>
         Checkout Process
@@ -324,15 +339,36 @@ function CheckoutPage() {
               </Box>
             </Box>
 
+            {/* ✅ 1. CONFIRM ORDER BUTTON */}
+            <Button
+              variant="outlined"
+              color="primary"
+              size="large"
+              fullWidth
+              onClick={handleConfirmOrder}
+              disabled={cartItems.length === 0 || !isFormValid || isOrderConfirmed} // কনফার্ম হলে ডিসেবল
+              sx={{
+                mt: 3,
+                py: 1.5,
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                borderWidth: 2,
+                '&:hover': { borderWidth: 2 }
+              }}
+            >
+              {isOrderConfirmed ? "✅ ORDER CONFIRMED" : "CONFIRM ORDER"}
+            </Button>
+
+            {/* ✅ 2. PROCEED TO PAYMENT BUTTON */}
             <Button
               variant="contained"
               color="primary"
               size="large"
               fullWidth
               onClick={handleProceedToPayment}
-              disabled={cartItems.length === 0 || !isFormValid}
+              disabled={!isOrderConfirmed} // অর্ডার কনফার্ম না করা পর্যন্ত ডিসেবল
               sx={{
-                mt: 3,
+                mt: 2,
                 py: 1.5,
                 fontSize: '1.1rem',
                 fontWeight: 'bold',
@@ -366,3 +402,5 @@ function CheckoutPage() {
 }
 
 export default CheckoutPage;
+
+

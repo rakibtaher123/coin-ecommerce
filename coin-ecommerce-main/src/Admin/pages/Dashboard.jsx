@@ -1,12 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Grid, Typography, Paper, CircularProgress, Card, CardContent, Button, Alert, Snackbar } from '@mui/material';
-import { ShoppingCart, Inventory, People, AttachMoney, Gavel, Settings, LocalShipping, Visibility, AssignmentInd, Archive } from '@mui/icons-material';
+import {
+  ShoppingCart, Inventory, People, AttachMoney, Gavel,
+  Settings, LocalShipping, Visibility, AssignmentInd, Archive, Logout
+} from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-// Reusable Stat Card Component
-const StatCard = ({ title, value, icon, color, subText }) => (
-  <Paper elevation={3} sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%', borderRadius: 2 }}>
+// Reusable Components matching Client Dashboard style
+const StatCard = ({ title, value, icon, color, subText, onClick }) => (
+  <Paper
+    elevation={3}
+    onClick={onClick}
+    sx={{
+      p: 3,
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      height: '100%',
+      borderRadius: 2,
+      cursor: onClick ? 'pointer' : 'default',
+      transition: 'all 0.3s ease',
+      '&:hover': onClick ? {
+        transform: 'translateY(-4px)',
+        boxShadow: 6
+      } : {}
+    }}
+  >
     <Box>
       <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
         {title}
@@ -24,38 +44,30 @@ const StatCard = ({ title, value, icon, color, subText }) => (
   </Paper>
 );
 
-// Reusable Action Button Component
-const ActionButton = ({ title, icon, color, path, onClick }) => {
-  const navigate = useNavigate();
-  return (
-    <Button
-      variant="contained"
-      onClick={onClick || (() => navigate(path))}
-      sx={{
-        width: '100%',
-        height: '120px',
-        bgcolor: color,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        borderRadius: 2,
-        boxShadow: 3,
-        transition: 'transform 0.2s',
-        '&:hover': {
-          transform: 'scale(1.03)',
-          bgcolor: color,
-          filter: 'brightness(0.9)',
-        },
-      }}
-    >
-      <Box sx={{ fontSize: 40, mb: 1 }}>{icon}</Box>
+const ActionButton = ({ title, icon, color, onClick }) => (
+  <Card
+    onClick={onClick}
+    sx={{
+      cursor: 'pointer',
+      transition: 'all 0.3s ease',
+      '&:hover': { transform: 'translateY(-5px)', boxShadow: 10 },
+      bgcolor: color,
+      color: 'white',
+      height: '100%',
+      borderRadius: 2,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}
+  >
+    <CardContent sx={{ textAlign: 'center', py: 4 }}>
+      {React.cloneElement(icon, { sx: { fontSize: 45, mb: 1 } })}
       <Typography variant="h6" fontWeight="bold">
         {title}
       </Typography>
-    </Button>
-  );
-};
+    </CardContent>
+  </Card>
+);
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -69,8 +81,6 @@ const Dashboard = () => {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  // Notification State
   const [notification, setNotification] = useState({ open: false, message: '' });
 
   useEffect(() => {
@@ -108,45 +118,43 @@ const Dashboard = () => {
 
     // 3. Socket.io for Real-time New Order Alerts
     const socket = io('http://localhost:5000');
-
     socket.on('new_order', (data) => {
       setNotification({
         open: true,
         message: `🔔 New Order! ${data.user} ordered items worth ৳${data.amount}`
       });
-      // Refresh stats on new order
       fetchStats();
     });
 
-    return () => {
-      socket.disconnect();
-    };
-
+    return () => socket.disconnect();
   }, [navigate]);
 
-  return (
-    <Box sx={{ flexGrow: 1, p: 3, bgcolor: '#f4f6f8', minHeight: '100vh' }}>
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo');
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
+    window.location.href = "/login";
+  };
 
-      {/* 👋 Welcome Header */}
-      <Container maxWidth="xl" sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box display="flex" alignItems="center">
-          <Typography variant="h4" fontWeight="bold" color="primary" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box component="span" sx={{ fontSize: '3rem', lineHeight: 1 }}>🛡️</Box>
-            Admin Dashboard
-          </Typography>
-        </Box>
-        <Button variant="contained" color="error" endIcon={<Visibility />} onClick={() => {
-          // ১. সব localStorage তথ্য মুছে ফেলা
-          localStorage.removeItem('userInfo');
-          localStorage.removeItem('token');
-          localStorage.removeItem('userRole');
-          localStorage.removeItem('userEmail');
-          // ২. Hard reload করে login page এ পাঠানো
-          window.location.href = "/login";
-        }}>
-          LOGOUT
+  return (
+    <Box sx={{ flexGrow: 1, bgcolor: '#f4f6f8', minHeight: '100vh', pb: 8 }}>
+
+      {/* Header matching Client Dashboard */}
+      <Box sx={{ bgcolor: 'white', px: 4, py: 2, boxShadow: 1, mb: 5, display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 10 }}>
+        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#1b5e20', display: 'flex', alignItems: 'center', gap: 1 }}>
+          🛡️ Admin Dashboard
+        </Typography>
+        <Button
+          variant="contained"
+          color="error"
+          startIcon={<Logout />}
+          onClick={handleLogout}
+          sx={{ fontWeight: 'bold' }}
+        >
+          Logout
         </Button>
-      </Container>
+      </Box>
 
       {/* 🔔 Notification Snackbar */}
       <Snackbar
@@ -191,6 +199,7 @@ const Dashboard = () => {
                   icon={<ShoppingCart fontSize="large" />}
                   color="#f57c00" // Orange
                   subText={`${stats.pendingOrders || 0} Pending`}
+                  onClick={() => navigate('/admin/orders')}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
@@ -200,6 +209,7 @@ const Dashboard = () => {
                   icon={<Inventory fontSize="large" />}
                   color="#1976d2" // Blue
                   subText="Items in Stock"
+                  onClick={() => navigate('/admin/products')}
                 />
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
@@ -209,93 +219,84 @@ const Dashboard = () => {
                   icon={<People fontSize="large" />}
                   color="#7b1fa2" // Purple
                   subText="Registered Clients"
+                  onClick={() => navigate('/admin/users')}
                 />
               </Grid>
             </Grid>
 
-            {/* --- Quick Actions Section --- */}
+            {/* --- Quick Management Section --- */}
             <Typography variant="h6" sx={{ mb: 3, fontWeight: 'bold', color: '#444', borderLeft: '5px solid #1976d2', pl: 2 }}>
               Quick Management
             </Typography>
 
             <Grid container spacing={3}>
-
-              {/* Row 1: Products, Live System, Users */}
+              {/* Row 1 */}
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="Manage Products"
                   icon={<Inventory />}
                   color="#2e7d32" // Green
-                  path="/admin/products"
+                  onClick={() => navigate('/admin/products')}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="Live Bidding Control"
                   icon={<Gavel />}
                   color="#ed6c02" // Orange
-                  path="/admin/auctions/live-system"
+                  onClick={() => navigate('/admin/auctions/live-system')}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="Manage Users"
                   icon={<People />}
                   color="#0288d1" // Info Blue
-                  path="/admin/users"
+                  onClick={() => navigate('/admin/users')}
                 />
               </Grid>
 
-              {/* Row 2: Create Auction, Orders, Settings */}
+              {/* Row 2 */}
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="Manage Auctions"
                   icon={<Gavel />}
                   color="#d32f2f" // Red
-                  path="/admin/auctions"
+                  onClick={() => navigate('/admin/auctions')}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="View Orders"
                   icon={<LocalShipping />}
                   color="#f57c00" // Orange-Red
-                  path="/admin/orders"
+                  onClick={() => navigate('/admin/orders')}
                 />
               </Grid>
-
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="Site Settings"
                   icon={<Settings />}
                   color="#455a64" // Grey
-                  path="/admin/settings"
+                  onClick={() => navigate('/admin/settings')}
                 />
               </Grid>
 
-            </Grid>
-
-            {/* Row 3: Extra Management */}
-            <Grid container spacing={3} sx={{ mt: 1 }}>
+              {/* Row 3 */}
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="Bidder Management"
                   icon={<AssignmentInd />}
                   color="#5e35b1" // Deep Purple
-                  path="/admin/auctions/bidders"
+                  onClick={() => navigate('/admin/auctions/bidders')}
                 />
               </Grid>
-
-              {/* 🗂️ Manage Archives - NEW */}
               <Grid item xs={12} sm={6} md={4}>
                 <ActionButton
                   title="Manage Archives"
                   icon={<Archive />}
                   color="#00695c" // Teal
-                  path="/admin/manage-archives"
+                  onClick={() => navigate('/admin/manage-archives')}
                 />
               </Grid>
             </Grid>

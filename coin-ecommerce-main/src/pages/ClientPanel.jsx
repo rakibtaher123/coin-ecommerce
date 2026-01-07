@@ -43,17 +43,73 @@ const ClientPanel = () => {
       console.error('Error parsing token:', err);
     }
 
-    setTimeout(() => {
-      setLoading(false);
-    }, 500);
+    // Fetch real dashboard stats from backend
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/client/dashboard-stats', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📊 Dashboard Stats received:', data);
+          setStats({
+            totalOrders: data.totalOrders || 0,
+            pendingOrders: data.pendingOrders || 0,
+            completedOrders: data.completedOrders || 0,
+            totalSpent: data.totalSpent || 0
+          });
+        } else {
+          console.log('📊 API returned non-ok status, showing zeros');
+          // Show zeros if API fails - real data will show when available
+          setStats({
+            totalOrders: 0,
+            pendingOrders: 0,
+            completedOrders: 0,
+            totalSpent: 0
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard stats:', error);
+        // Show zeros on error - real data will show when available
+        setStats({
+          totalOrders: 0,
+          pendingOrders: 0,
+          completedOrders: 0,
+          totalSpent: 0
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
   }, [navigate]);
 
   const handleLogout = () => {
     logout(); // AuthContext logout handles both state clearing and redirect
   };
 
-  const StatCard = ({ title, value, icon, color, subText }) => (
-    <Paper elevation={3} sx={{ p: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '100%', borderRadius: 2 }}>
+  const StatCard = ({ title, value, icon, color, subText, onClick }) => (
+    <Paper
+      elevation={3}
+      onClick={onClick}
+      sx={{
+        p: 3,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: '100%',
+        borderRadius: 2,
+        cursor: onClick ? 'pointer' : 'default',
+        transition: 'all 0.3s ease',
+        '&:hover': onClick ? {
+          transform: 'translateY(-4px)',
+          boxShadow: 6
+        } : {}
+      }}
+    >
       <Box>
         <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>
           {title}
@@ -139,6 +195,7 @@ const ClientPanel = () => {
               icon={<ShoppingBag fontSize="large" />}
               color="#1976d2" // Blue
               subText="All Time"
+              onClick={() => navigate('/client/orders')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -148,6 +205,7 @@ const ClientPanel = () => {
               icon={<HourglassEmpty fontSize="large" />}
               color="#f57c00" // Orange
               subText="In Progress"
+              onClick={() => navigate('/client/orders?status=pending')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -157,6 +215,7 @@ const ClientPanel = () => {
               icon={<CheckCircle fontSize="large" />}
               color="#2e7d32" // Green
               subText="Delivered"
+              onClick={() => navigate('/client/orders?status=completed')}
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
@@ -166,6 +225,7 @@ const ClientPanel = () => {
               icon={<AttachMoney fontSize="large" />}
               color="#7b1fa2" // Purple
               subText="Lifetime"
+              onClick={() => navigate('/client/payments')}
             />
           </Grid>
         </Grid>
@@ -183,7 +243,7 @@ const ClientPanel = () => {
               title="Browse Products"
               icon={<ShoppingBag />}
               color="#1976d2" // Blue
-              onClick={() => navigate('/all-products')}
+              onClick={() => navigate('/client/products')}
             />
           </Grid>
 
@@ -240,3 +300,4 @@ const ClientPanel = () => {
 };
 
 export default ClientPanel;
+

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { registerUser } from '../api/auth';
 import { Alert, Box, CircularProgress } from '@mui/material';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPath = location.state?.from || '/client';
 
   const [formData, setFormData] = useState({
     name: '',
@@ -40,7 +42,8 @@ const RegisterPage = () => {
       const response = await registerUser(formData);
       if (response.status === 201 || response.status === 200) {
         alert('Registration Successful! Redirecting to Login...');
-        navigate('/login');
+        // Pass the original 'from' path to the login page so it can redirect back to checkout
+        navigate('/login', { state: { from: fromPath } });
       }
     } catch (err) {
       console.error(err);
@@ -95,7 +98,7 @@ const RegisterPage = () => {
         </form>
 
         <p style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px' }}>
-          Already have an account? <span style={{ color: '#d32f2f', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => navigate('/login')}>Login here</span>
+          Already have an account? <span style={{ color: '#d32f2f', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => navigate('/login', { state: { from: fromPath } })}>Login here</span>
         </p>
       </div>
     </div>

@@ -132,6 +132,48 @@ if (fs.existsSync(assetsPath)) {
 // ✅ 5. API Routes
 // ===============================
 
+// ✅ Client Dashboard Stats (for logged-in users)
+const { protect } = require("./middleware/authMiddleware");
+
+app.get("/api/client/dashboard-stats", protect, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const mongoose = require('mongoose');
+
+    // Ensure userId is ObjectId
+    const userObjectId = new mongoose.Types.ObjectId(userId);
+
+    console.log(`📊 Fetching dashboard stats for user: ${userId}`);
+
+    const [totalOrders, pendingOrders, completedOrders, spentResult] =
+      await Promise.all([
+        Order.countDocuments({ user: userObjectId }),
+        Order.countDocuments({ user: userObjectId, status: { $in: ['Pending', 'Processing'] } }),
+        Order.countDocuments({ user: userObjectId, status: 'Delivered' }),
+        Order.aggregate([
+          { $match: { user: userObjectId } },
+          { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+        ])
+      ]);
+
+    const totalSpent = spentResult.length > 0 ? spentResult[0].total : 0;
+
+    console.log(`📊 Stats - Total: ${totalOrders}, Pending: ${pendingOrders}, Completed: ${completedOrders}, Spent: ${totalSpent}`);
+
+    res.json({
+      success: true,
+      totalOrders,
+      pendingOrders,
+      completedOrders,
+      totalSpent
+    });
+
+  } catch (err) {
+    console.error("Client Dashboard Stats Error:", err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 // ✅ Dashboard Stats
 app.get("/api/dashboard-stats", async (req, res) => {
   try {

@@ -33,7 +33,10 @@ import PaymentConfirm from './pages/PaymentConfirm'; // Import PaymentConfirm
 
 // Client Dashboard Pages
 import ClientProductsPage from './pages/ClientProductsPage';
+import ClientProductDetailsPage from './pages/ClientProductDetailsPage'; // ✅ Import ClientProductDetailsPage
+import ClientCartPage from './pages/ClientCartPage'; // ✅ Import ClientCartPage
 import ClientOrdersPage from './pages/ClientOrdersPage';
+import ClientOrderDetailsPage from './pages/ClientOrderDetailsPage'; // ✅ New Import
 import ClientSettingsPage from './pages/ClientSettingsPage';
 import ClientAddressPage from './pages/ClientAddressPage';
 import ClientPaymentsPage from './pages/ClientPaymentsPage';
@@ -131,7 +134,10 @@ function App() {
                     {/* --- ক্লায়েন্ট ড্যাশবোর্ড --- */}
                     <Route path="/client" element={<ClientPanel />} />
                     <Route path="/client/products" element={<ClientProductsPage />} />
+                    <Route path="/client/product/:id" element={<ClientProductDetailsPage />} /> {/* ✅ New Client Product Route */}
+                    <Route path="/client/cart" element={<ClientCartPage />} /> {/* ✅ New Client Cart Route */}
                     <Route path="/client/orders" element={<ClientOrdersPage />} />
+                    <Route path="/client/orders/:id" element={<ClientOrderDetailsPage />} /> {/* ✅ New Route */}
                     <Route path="/client/settings" element={<ClientSettingsPage />} />
                     <Route path="/client/profile" element={<ClientSettingsPage />} />       {/* Alias for Profile Settings */}
                     <Route path="/client/bid-history" element={<BidHistoryPage />} />       {/* Alias for Bid History */}

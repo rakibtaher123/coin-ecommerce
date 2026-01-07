@@ -6,9 +6,11 @@ import {
     AppBar, Toolbar, IconButton
 } from '@mui/material';
 import { ArrowBack, ShoppingCart, Search } from '@mui/icons-material';
+import { useCart } from '../context/CartProvider';
 
 const ClientProductsPage = () => {
     const navigate = useNavigate();
+    const { addToCart } = useCart();
     const [products, setProducts] = useState([]);
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -68,19 +70,7 @@ const ClientProductsPage = () => {
     }, [selectedCategory, searchQuery, products]);
 
     const handleAddToCart = (product) => {
-        // Get existing cart
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-        // Check if product already in cart
-        const existingIndex = cart.findIndex(item => item._id === product._id);
-
-        if (existingIndex >= 0) {
-            cart[existingIndex].quantity += 1;
-        } else {
-            cart.push({ ...product, quantity: 1 });
-        }
-
-        localStorage.setItem('cart', JSON.stringify(cart));
+        addToCart(product);
         alert(`✅ ${product.name} added to cart!`);
     };
 
@@ -95,7 +85,7 @@ const ClientProductsPage = () => {
                     <Typography variant="h6" sx={{ flexGrow: 1, ml: 2 }}>
                         Browse Products
                     </Typography>
-                    <IconButton color="inherit" onClick={() => navigate('/cart')}>
+                    <IconButton color="inherit" onClick={() => navigate('/client/cart')}>
                         <ShoppingCart />
                     </IconButton>
                 </Toolbar>
@@ -181,7 +171,7 @@ const ClientProductsPage = () => {
                                             </Button>
                                             <Button
                                                 variant="outlined"
-                                                onClick={() => navigate(`/product/${product._id}`)}
+                                                onClick={() => navigate(`/client/product/${product._id}`)}
                                             >
                                                 View
                                             </Button>

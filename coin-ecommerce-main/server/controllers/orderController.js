@@ -79,4 +79,66 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-module.exports = { addOrderItems, getOrders, getMyOrders };
+// ৪. নির্দিষ্ট অর্ডার দেখা (Get Order by ID)
+const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate("user", "name email");
+
+    if (order) {
+      res.json(order);
+    } else {
+      res.status(404).json({ message: "Order not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// ৫. অর্ডার ডিলিট করা (Delete Order)
+const deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      // Check if user is owner or admin
+      if (order.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+        return res.status(401).json({ message: "Not authorized to delete this order" });
+      }
+
+      await order.deleteOne();
+      res.json({ message: "Order removed" });
+    } else {
+      res.status(404).json({ message: "Order not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// ৬. অর্ডার স্ট্যাটাস আপডেট করা (Admin Only)
+const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (order) {
+      order.status = status;
+      if (status === 'Delivered') {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+      }
+
+      const updatedOrder = await order.save();
+      res.json(updatedOrder);
+    } else {
+      res.status(404).json({ message: "Order not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+module.exports = { addOrderItems, getOrders, getMyOrders, getOrderById, deleteOrder, updateOrderStatus };

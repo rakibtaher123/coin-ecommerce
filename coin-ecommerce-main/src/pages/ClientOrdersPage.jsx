@@ -1,93 +1,135 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     Container, Paper, Typography, Button, Box, AppBar, Toolbar, IconButton,
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Chip, Card, CardContent, Grid, Divider
+    Chip, Card, CardContent, Grid, Divider, CircularProgress, Tabs, Tab
 } from '@mui/material';
 import { ArrowBack, Visibility } from '@mui/icons-material';
 
 const ClientOrdersPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState(0);
+
+    // Get status from URL query params
+    const searchParams = new URLSearchParams(location.search);
+    const statusFilter = searchParams.get('status');
 
     useEffect(() => {
+        // Set active tab based on status filter
+        if (statusFilter === 'pending') setActiveTab(1);
+        else if (statusFilter === 'completed') setActiveTab(2);
+        else setActiveTab(0);
+
         fetchOrders();
-    }, []);
+    }, [statusFilter]);
 
     const fetchOrders = async () => {
-        // TODO: Implement real API call to fetch user's orders
-        // For now, using sample data
-        setTimeout(() => {
-            setOrders([
-                {
-                    _id: '1',
-                    orderNumber: 'ORD-2024-001',
-                    date: '2024-12-10',
-                    status: 'Delivered',
-                    total: 25000,
-                    items: [
-                        { name: 'Akbar Silver Rupee', price: 15000, quantity: 1 },
-                        { name: 'Mughal Gold Mohur', price: 10000, quantity: 1 }
-                    ]
-                },
-                {
-                    _id: '2',
-                    orderNumber: 'ORD-2024-002',
-                    date: '2024-12-12',
-                    status: 'Processing',
-                    total: 5000,
-                    items: [
-                        { name: '1 Taka Coin (1973)', price: 5000, quantity: 1 }
-                    ]
-                },
-                {
-                    _id: '3',
-                    orderNumber: 'ORD-2024-003',
-                    date: '2024-12-13',
-                    status: 'Pending',
-                    total: 18000,
-                    items: [
-                        { name: 'British Indian Rupee', price: 18000, quantity: 1 }
-                    ]
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
+            const response = await fetch('http://localhost:5000/api/orders/myorders', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
                 }
-            ]);
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setOrders(data);
+            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+        } finally {
             setLoading(false);
-        }, 500);
+        }
     };
 
     const getStatusColor = (status) => {
-        switch (status.toLowerCase()) {
+        switch (status?.toLowerCase()) {
             case 'delivered': return 'success';
             case 'processing': return 'warning';
-            case 'pending': return 'info';
+            case 'shipped': return 'info';
+            case 'pending': return 'warning';
             case 'cancelled': return 'error';
             default: return 'default';
         }
     };
 
+    const handleTabChange = (event, newValue) => {
+        setActiveTab(newValue);
+        if (newValue === 0) navigate('/client/orders');
+        else if (newValue === 1) navigate('/client/orders?status=pending');
+        else if (newValue === 2) navigate('/client/orders?status=completed');
+    };
+
+    const filteredOrders = orders.filter(order => {
+        if (activeTab === 1) return order.status === 'Pending' || order.status === 'Processing';
+        if (activeTab === 2) return order.status === 'Delivered';
+        return true; // Show all for tab 0
+    });
+
+    const handleDeleteOrder = async (orderId) => {
+        if (!window.confirm("Are you sure you want to delete this order?")) return;
+
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                alert("Order deleted successfully!");
+                // Remove order from local state
+                setOrders(orders.filter(order => order._id !== orderId));
+            } else {
+                const data = await response.json();
+                alert(data.message || "Failed to delete order");
+            }
+        } catch (error) {
+            console.error("Error deleting order:", error);
+            alert("Error deleting order");
+        }
+    };
+
     return (
-        <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+        <Box sx={{ minHeight: '100vh', bgcolor: '#f4f6f8', py: 4 }}>
             {/* Header */}
-            <AppBar position="sticky">
-                <Toolbar>
-                    <IconButton edge="start" color="inherit" onClick={() => navigate('/client')}>
+            <Container maxWidth="lg">
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 3, gap: 2 }}>
+                    <IconButton onClick={() => navigate('/client')} sx={{ bgcolor: 'white' }}>
                         <ArrowBack />
                     </IconButton>
-                    <Typography variant="h6" sx={{ flexGrow: 1, ml: 2 }}>
+                    <Typography variant="h4" fontWeight="bold" color="#1b5e20">
                         My Orders
                     </Typography>
-                </Toolbar>
-            </AppBar>
+                </Box>
 
-            <Container sx={{ py: 4 }}>
+                {/* Tabs */}
+                <Tabs value={activeTab} onChange={handleTabChange} sx={{ mb: 3, bgcolor: 'white', borderRadius: 2, p: 1 }}>
+                    <Tab label={`All Orders (${orders.length})`} />
+                    <Tab label={`Pending (${orders.filter(o => o.status === 'Pending' || o.status === 'Processing').length})`} />
+                    <Tab label={`Completed (${orders.filter(o => o.status === 'Delivered').length})`} />
+                </Tabs>
+
                 {loading ? (
-                    <Typography>Loading orders...</Typography>
-                ) : orders.length === 0 ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                        <CircularProgress size={60} color="success" />
+                    </Box>
+                ) : filteredOrders.length === 0 ? (
                     <Box sx={{ textAlign: 'center', py: 8 }}>
                         <Typography variant="h6" color="text.secondary" gutterBottom>
-                            No orders yet
+                            No orders found
                         </Typography>
                         <Button variant="contained" onClick={() => navigate('/client/products')} sx={{ mt: 2 }}>
                             Start Shopping
@@ -95,7 +137,7 @@ const ClientOrdersPage = () => {
                     </Box>
                 ) : (
                     <Grid container spacing={3}>
-                        {orders.map((order) => (
+                        {filteredOrders.map((order) => (
                             <Grid item xs={12} key={order._id}>
                                 <Card>
                                     <CardContent>
@@ -103,17 +145,24 @@ const ClientOrdersPage = () => {
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                                             <Box>
                                                 <Typography variant="h6" gutterBottom>
-                                                    Order #{order.orderNumber}
+                                                    Order #{order._id.slice(-8)}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    Date: {new Date(order.date).toLocaleDateString('en-GB')}
+                                                    Date: {new Date(order.createdAt).toLocaleDateString('en-GB')}
                                                 </Typography>
                                             </Box>
-                                            <Chip
-                                                label={order.status}
-                                                color={getStatusColor(order.status)}
-                                                sx={{ fontWeight: 'bold' }}
-                                            />
+                                            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                                                <Chip
+                                                    label={order.isPaid ? 'Paid' : 'Unpaid'}
+                                                    color={order.isPaid ? 'success' : 'warning'}
+                                                    size="small"
+                                                />
+                                                <Chip
+                                                    label={order.status}
+                                                    color={getStatusColor(order.status)}
+                                                    sx={{ fontWeight: 'bold' }}
+                                                />
+                                            </Box>
                                         </Box>
 
                                         <Divider sx={{ my: 2 }} />
@@ -122,10 +171,10 @@ const ClientOrdersPage = () => {
                                         <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                                             Items:
                                         </Typography>
-                                        {order.items.map((item, index) => (
+                                        {order.orderItems?.map((item, index) => (
                                             <Box key={index} sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}>
                                                 <Typography variant="body2">
-                                                    {item.name} (x{item.quantity})
+                                                    {item.name} (x{item.qty})
                                                 </Typography>
                                                 <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
                                                     ৳{item.price.toLocaleString()}
@@ -138,22 +187,43 @@ const ClientOrdersPage = () => {
                                         {/* Total & Actions */}
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <Typography variant="h6" color="primary">
-                                                Total: ৳{order.total.toLocaleString()}
+                                                Total: ৳{order.totalPrice.toLocaleString()}
                                             </Typography>
                                             <Box sx={{ display: 'flex', gap: 1 }}>
+                                                {!order.isPaid && (
+                                                    <>
+                                                        <Button
+                                                            variant="contained"
+                                                            size="small"
+                                                            color="success"
+                                                            onClick={() => {
+                                                                localStorage.setItem('checkoutData', JSON.stringify({
+                                                                    cartItems: order.orderItems,
+                                                                    totalPrice: order.totalPrice,
+                                                                    shippingInfo: order.shippingAddress
+                                                                }));
+                                                                navigate('/client/payment');
+                                                            }}
+                                                        >
+                                                            Pay Now
+                                                        </Button>
+                                                        <Button
+                                                            variant="outlined"
+                                                            color="error"
+                                                            size="small"
+                                                            onClick={() => handleDeleteOrder(order._id)}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </>
+                                                )}
                                                 <Button
                                                     variant="outlined"
                                                     startIcon={<Visibility />}
                                                     size="small"
+                                                    onClick={() => navigate(`/client/orders/${order._id}`)}
                                                 >
                                                     View Details
-                                                </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    size="small"
-                                                    onClick={() => navigate('/track-order')}
-                                                >
-                                                    Track Order
                                                 </Button>
                                             </Box>
                                         </Box>
@@ -169,3 +239,4 @@ const ClientOrdersPage = () => {
 };
 
 export default ClientOrdersPage;
+

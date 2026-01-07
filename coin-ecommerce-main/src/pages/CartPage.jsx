@@ -22,7 +22,13 @@ const CartPage = () => {
   };
 
   const handleCheckoutClick = () => {
-    navigate('/client/checkout');
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/client/checkout');
+    } else {
+      // Redirect to login, then to checkout
+      navigate('/login', { state: { from: '/client/checkout' } });
+    }
   };
 
   // Handle empty or loading state safely
@@ -125,7 +131,7 @@ const CartPage = () => {
                 onClick={handleCheckoutClick}
                 sx={{ bgcolor: '#1b5e20', py: 1.5, '&:hover': { bgcolor: '#004d40' } }}
               >
-                PROCEED TO CHECKOUT
+                CONFIRM ORDER
               </Button>
             </Paper>
           </Grid>
