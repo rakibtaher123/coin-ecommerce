@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { ArrowBack, ShoppingCart, Search } from '@mui/icons-material';
 import { useCart } from '../context/CartProvider';
-import { API_BASE_URL } from '../config';
+// import { API_BASE_URL } from '../config';
 
 const ClientProductsPage = () => {
     const navigate = useNavigate();
@@ -41,7 +41,7 @@ const ClientProductsPage = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/products`);
+            const response = await fetch(`http://localhost:5000/api/products`);
             const data = await response.json();
             setProducts(data);
             setFilteredProducts(data);
@@ -141,7 +141,7 @@ const ClientProductsPage = () => {
                                     <CardMedia
                                         component="img"
                                         height="200"
-                                        image={product.image.startsWith('http') ? product.image : `${API_BASE_URL}${product.image}`}
+                                        image={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`}
                                         alt={product.name}
                                         sx={{ objectFit: 'cover' }}
                                     />

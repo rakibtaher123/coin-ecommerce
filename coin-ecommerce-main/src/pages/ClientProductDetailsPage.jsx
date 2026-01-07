@@ -6,11 +6,11 @@ import {
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowBack, ShoppingCart, LocalOffer, Category, Description } from '@mui/icons-material';
 import { useCart } from '../context/CartProvider';
-import { API_BASE_URL } from '../config';
+// import { API_BASE_URL } from '../config';
 
 const getFullImageUrl = (imagePath) => {
     if (imagePath && !imagePath.startsWith('http')) {
-        return `${API_BASE_URL}${imagePath}`;
+        return `http://localhost:5000${imagePath}`;
     }
     return imagePath;
 };
@@ -35,7 +35,7 @@ const ClientProductDetailsPage = () => {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
+                const response = await fetch(`http://localhost:5000/api/products/${id}`);
 
                 if (response.status === 404) {
                     throw new Error("Product not found in the database.");

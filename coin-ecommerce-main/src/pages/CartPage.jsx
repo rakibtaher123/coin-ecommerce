@@ -6,7 +6,6 @@ import {
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartProvider';
-import { API_BASE_URL } from '../config';
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -19,7 +18,7 @@ const CartPage = () => {
     // ✅ শুধু এই লাইনে error ছিল, এটা ঠিক করা হয়েছে
     return imagePath.startsWith('http')
       ? imagePath
-      : `${API_BASE_URL}${imagePath}`;
+      : `http://localhost:5000${imagePath}`;
   };
 
   const handleCheckoutClick = () => {

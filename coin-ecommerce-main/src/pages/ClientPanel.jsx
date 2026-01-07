@@ -9,7 +9,6 @@ import {
   Gavel, Logout, AccountCircle, LocationOn, Payment, ArrowBack
 } from '@mui/icons-material';
 import { AuthContext } from '../context/AuthContext';
-import { API_BASE_URL } from '../config';
 
 // Import sub-pages
 import LiveBiddingPage from './LiveBiddingPage';
@@ -47,7 +46,7 @@ const ClientPanel = () => {
     // Fetch real dashboard stats from backend
     const fetchStats = async () => {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/client/dashboard-stats`, {
+        const response = await fetch('http://localhost:5000/api/client/dashboard-stats', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -160,8 +159,6 @@ const ClientPanel = () => {
       </Box>
     );
   }
-
-
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#f4f6f8', pb: 8 }}>
@@ -301,4 +298,3 @@ const ClientPanel = () => {
 };
 
 export default ClientPanel;
-

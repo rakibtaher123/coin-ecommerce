@@ -6,7 +6,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
-import { API_BASE_URL } from '../../config';
+// import { API_BASE_URL } from '../../config';
 
 // Reusable Components matching Client Dashboard style
 const StatCard = ({ title, value, icon, color, subText, onClick }) => (
@@ -97,7 +97,7 @@ const Dashboard = () => {
     // 2. Fetch Stats
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/dashboard-stats`);
+        const res = await fetch('http://localhost:5000/api/dashboard-stats');
         const data = await res.json();
         if (data.success) {
           setStats({
@@ -118,7 +118,7 @@ const Dashboard = () => {
     fetchStats();
 
     // 3. Socket.io for Real-time New Order Alerts
-    const socket = io(API_BASE_URL);
+    const socket = io('http://localhost:5000');
     socket.on('new_order', (data) => {
       setNotification({
         open: true,

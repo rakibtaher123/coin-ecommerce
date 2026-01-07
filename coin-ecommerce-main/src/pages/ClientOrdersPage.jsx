@@ -6,7 +6,7 @@ import {
     Chip, Card, CardContent, Grid, Divider, CircularProgress, Tabs, Tab
 } from '@mui/material';
 import { ArrowBack, Visibility } from '@mui/icons-material';
-import { API_BASE_URL } from '../config';
+// import { API_BASE_URL } from '../config';
 
 const ClientOrdersPage = () => {
     const navigate = useNavigate();
@@ -36,7 +36,7 @@ const ClientOrdersPage = () => {
                 return;
             }
 
-            const response = await fetch(`${API_BASE_URL}/api/orders/myorders`, {
+            const response = await fetch(`http://localhost:5000/api/orders/myorders`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -82,7 +82,7 @@ const ClientOrdersPage = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+            const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
