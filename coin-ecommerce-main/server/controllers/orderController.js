@@ -102,7 +102,7 @@ const deleteOrder = async (req, res) => {
 
     if (order) {
       // Check if user is owner or admin
-      if (order.user.toString() !== req.user._id.toString() && !req.user.isAdmin) {
+      if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
         return res.status(401).json({ message: "Not authorized to delete this order" });
       }
 
