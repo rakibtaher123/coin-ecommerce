@@ -4,8 +4,8 @@ const path = require('path');
 // স্টোরেজ ইঞ্জিন কনফিগারেশন
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // ছবিগুলো যেখানে সেভ হবে
-        cb(null, path.join(__dirname, '../public/assets'));
+        // ছবিগুলো যেখানে সেভ হবে target: ROOT/public/assets
+        cb(null, path.join(__dirname, '../../public/assets'));
     },
     filename: (req, file, cb) => {
         // ফাইলের নাম ইউনিক করা (timestamp + original name)
