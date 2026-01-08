@@ -60,7 +60,7 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
       price,
       description,
       image: imagePath,
-      stock: stock || 0
+      countInStock: stock || 0   // 🔧 FIXED: schema field aligned
     });
 
     await newProduct.save();
@@ -76,7 +76,6 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
 });
 
 // ✅ PUT: প্রোডাক্ট আপডেট করা (Admin Only)
-// এখানে verifyAdmin এর বদলে protect, admin ব্যবহার করা হলো
 router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
   try {
     const productId = req.params.id;
@@ -93,7 +92,7 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
     if (req.file) {
       updateData.image = `/assets/${req.file.filename}`;
 
-      // 🧹 পুরনো ছবি ডিলিট করার লজিক (তোমার আগের কোড থেকেই রাখা)
+      // 🧹 পুরনো ছবি ডিলিট করার লজিক
       if (product.image && product.image.startsWith('/assets/')) {
         const oldFilePath = path.join(__dirname, '../public', product.image);
         if (fs.existsSync(oldFilePath)) {
