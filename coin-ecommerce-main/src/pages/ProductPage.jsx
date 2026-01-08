@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { Box, Container, Grid, Card, CardMedia, Typography, Button, TextField, CircularProgress } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 // import coinData from '../dataWithMeta'; // ❌ স্ট্যাটিক ডাটা সোর্স বাদ দেওয়া হলো
-import { useCart } from '../context/CartProvider'; 
+import { useCart } from '../context/CartProvider';
 // import { useProducts } from '../context/ProductContext'; // পুরো লিস্ট লোডের দরকার নেই
 
 // API Base URL (ProductContext এর সাথে সামঞ্জস্যপূর্ণ)
-const API_BASE_URL = "http://localhost:5000"; 
+const API_BASE_URL = "http://localhost:5000";
 
 // ✅ ইমেজ URL ফিক্স ফাংশন
 const getFullImageUrl = (imagePath) => {
     if (imagePath && !imagePath.startsWith('http')) {
-        return `${API_BASE_URL}${imagePath}`; 
+        // Ensure leading slash if missing
+        const pathWithSlash = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+        return `${API_BASE_URL}${pathWithSlash}`;
     }
     return imagePath;
 };
@@ -20,7 +22,7 @@ const ProductPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const cart = useCart();
-    
+
     // ✅ নতুন স্টেট: সরাসরি এই কম্পোনেন্টে ডাটা লোড হবে
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -38,7 +40,7 @@ const ProductPage = () => {
             try {
                 setLoading(true);
                 setError(null);
-                
+
                 // ✅ সরাসরি API endpoint থেকে একটি প্রোডাক্ট লোড করা হচ্ছে
                 const response = await fetch(`${API_BASE_URL}/api/products/${id}`);
 
@@ -51,7 +53,7 @@ const ProductPage = () => {
 
                 const data = await response.json();
                 setProduct(data);
-                
+
             } catch (err) {
                 console.error("❌ Single Product Fetch error:", err.message);
                 setError(err.message);
@@ -83,14 +85,14 @@ const ProductPage = () => {
             </Container>
         );
     }
-    
+
     // Product data is available here
     const handleAddToCart = () => {
         if (product.countInStock && qty > product.countInStock) {
             alert(`দুঃখিত! স্টকে আছে মাত্র ${product.countInStock} টি।`);
             return;
         }
-        
+
         // Add to Cart এ সঠিক প্রোডাক্ট অবজেক্ট ও কোয়ান্টিটি পাঠানো
         cart.addToCart(product, qty);
         navigate('/cart');
@@ -115,15 +117,15 @@ const ProductPage = () => {
 
                     <Grid item xs={12} md={6}>
                         <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1b5e20' }}>{product.name}</Typography>
-                        
+
                         {product.year && (
                             <Typography variant="subtitle1" sx={{ mt: 1, color: 'text.secondary' }}>Published: {product.year}</Typography>
                         )}
-                        
+
                         {product.description && (
                             <Typography variant="body1" sx={{ mt: 2 }}>{product.description}</Typography>
                         )}
-                        
+
                         <Typography variant="h5" sx={{ mt: 3, fontWeight: 'bold' }}>Price: ৳{product.price}</Typography>
 
                         <Typography variant="body1" sx={{ mt: 1, fontWeight: 'bold', color: product.countInStock > 0 ? 'black' : 'red' }}>
@@ -147,10 +149,10 @@ const ProductPage = () => {
                                 disabled={product.countInStock === 0}
                             />
 
-                            <Button 
-                                variant="contained" 
-                                color="success" 
-                                onClick={handleAddToCart} 
+                            <Button
+                                variant="contained"
+                                color="success"
+                                onClick={handleAddToCart}
                                 sx={{ py: 1.5 }}
                                 disabled={product.countInStock === 0}
                             >

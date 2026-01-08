@@ -10,7 +10,8 @@ import { useCart } from '../context/CartProvider';
 
 const getFullImageUrl = (imagePath) => {
     if (imagePath && !imagePath.startsWith('http')) {
-        return `http://localhost:5000${imagePath}`;
+        const pathWithSlash = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+        return `http://localhost:5000${pathWithSlash}`;
     }
     return imagePath;
 };

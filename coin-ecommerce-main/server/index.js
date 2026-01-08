@@ -112,9 +112,11 @@ io.on("connection", (socket) => {
 
 // ✅ 3. Static Assets
 const assetsPath = path.join(__dirname, '../public/assets');
-if (fs.existsSync(assetsPath)) {
-  app.use('/assets', express.static(assetsPath));
-}
+app.use('/assets', express.static(assetsPath));
+
+// Also serve the root public folder to catch other paths if needed
+const publicPath = path.join(__dirname, '../public');
+app.use('/public', express.static(publicPath));
 
 // ===============================
 // ✅ 4. Database Connection
