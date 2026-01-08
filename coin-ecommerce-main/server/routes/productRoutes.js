@@ -9,7 +9,7 @@ const upload = require('../middleware/upload');
 
 // 🔐 আমাদের তৈরি করা শক্তিশালী সিকিউরিটি চেক ইমপোর্ট করছি
 // (verifyAdmin এর বদলে আমরা এই দুটি ব্যবহার করব)
-const { protect, admin } = require('../middleware/authMiddleware'); 
+const { protect, admin } = require('../middleware/authMiddleware');
 
 // ✅ GET: সব প্রোডাক্ট দেখানো (public)
 router.get('/', async (req, res) => {
@@ -80,11 +80,11 @@ router.post('/', protect, admin, upload.single('image'), async (req, res) => {
 router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
   try {
     const productId = req.params.id;
-    
+
     // আগের প্রোডাক্ট খুঁজে বের করা (ছবি ডিলিট করার লজিকের জন্য)
     const product = await Product.findById(productId);
     if (!product) {
-        return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ error: "Product not found" });
     }
 
     let updateData = { ...req.body };
@@ -97,7 +97,7 @@ router.put('/:id', protect, admin, upload.single('image'), async (req, res) => {
       if (product.image && product.image.startsWith('/assets/')) {
         const oldFilePath = path.join(__dirname, '../public', product.image);
         if (fs.existsSync(oldFilePath)) {
-           fs.unlinkSync(oldFilePath);
+          fs.unlinkSync(oldFilePath);
         }
       }
     }
