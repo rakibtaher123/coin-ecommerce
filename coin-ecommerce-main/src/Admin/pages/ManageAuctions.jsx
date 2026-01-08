@@ -110,7 +110,8 @@ const ManageAuctions = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/assets/logos/coin_hero.jpg";
     if (imagePath.startsWith("http")) return imagePath;
-    return `${API_BASE_URL}${imagePath}`;
+    const pathWithSlash = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${API_BASE_URL}${pathWithSlash}`;
   };
 
   // Status color helper

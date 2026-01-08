@@ -64,7 +64,8 @@ const LiveBiddingMonitor = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '/assets/default-coin.jpg';
     if (imagePath.startsWith('http')) return imagePath;
-    return `${API_BASE_URL}${imagePath}`;
+    const pathWithSlash = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${API_BASE_URL}${pathWithSlash}`;
   };
 
   const formatTime = (timestamp) => {

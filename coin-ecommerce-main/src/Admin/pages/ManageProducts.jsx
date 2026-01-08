@@ -25,6 +25,16 @@ const CATEGORIES = [
   "Bd Republic Notes"
 ];
 
+const API_BASE_URL = "http://localhost:5000";
+
+const getFullImageUrl = (imagePath) => {
+  if (imagePath && !imagePath.startsWith('http')) {
+    const pathWithSlash = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `${API_BASE_URL}${pathWithSlash}`;
+  }
+  return imagePath;
+};
+
 const ManageProducts = () => {
   const [products, setProducts] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
@@ -46,14 +56,14 @@ const ManageProducts = () => {
   const getToken = () => {
     // পদ্ধতি ১: সরাসরি 'token' নামে লোকাল স্টোরেজে আছে কিনা চেক করি
     let token = localStorage.getItem('token');
-    
+
     // পদ্ধতি ২: যদি না থাকে, তবে 'userInfo' এর ভেতরে চেক করি (MERN প্রজেক্টে সচরাচর যা থাকে)
     if (!token) {
       const userInfo = localStorage.getItem('userInfo');
       if (userInfo) {
         try {
           const parsedUser = JSON.parse(userInfo);
-          token = parsedUser.token; 
+          token = parsedUser.token;
         } catch (error) {
           console.error("Token parsing error:", error);
         }
@@ -87,7 +97,7 @@ const ManageProducts = () => {
     setIsEditMode(false);
     setEditProductId(null);
     setSelectedCategory(category);
-    
+
     setName('');
     setPrice('');
     setStock(10);
@@ -102,7 +112,7 @@ const ManageProducts = () => {
     setIsEditMode(true);
     setEditProductId(product._id);
     setSelectedCategory(product.category);
-    
+
     setName(product.name);
     setPrice(product.price);
     setStock(product.countInStock || 0);
@@ -139,7 +149,7 @@ const ManageProducts = () => {
     formData.append('price', price);
     formData.append('countInStock', stock);
     formData.append('description', description);
-    
+
     if (imageFile) {
       formData.append('image', imageFile);
     }
@@ -151,8 +161,8 @@ const ManageProducts = () => {
     const token = getToken();
 
     if (!token) {
-        alert("⚠️ You are not logged in or token expired! Please logout and login again.");
-        return;
+      alert("⚠️ You are not logged in or token expired! Please logout and login again.");
+      return;
     }
 
     try {
@@ -167,15 +177,15 @@ const ManageProducts = () => {
       if (response.ok) {
         alert(isEditMode ? "✅ Product Updated Successfully!" : "✅ Product Added Successfully!");
         handleCloseDialog();
-        fetchProducts(); 
+        fetchProducts();
       } else {
         const text = await response.text();
         // এরর সুন্দরভাবে দেখানোর চেষ্টা
         try {
-            const errorObj = JSON.parse(text);
-            alert(`❌ Failed: ${errorObj.message || errorObj.error}`);
+          const errorObj = JSON.parse(text);
+          alert(`❌ Failed: ${errorObj.message || errorObj.error}`);
         } catch {
-            alert(`❌ Failed: ${text}`);
+          alert(`❌ Failed: ${text}`);
         }
       }
     } catch (error) {
@@ -258,7 +268,7 @@ const ManageProducts = () => {
                   {categoryProducts.map((product) => (
                     <Grid item xs={12} sm={6} md={4} lg={3} key={product._id}>
                       <Paper sx={{ p: 2, position: 'relative', '&:hover .action-btn': { opacity: 1 } }}>
-                        
+
                         {/* Edit Button */}
                         <IconButton
                           className="action-btn"
@@ -301,7 +311,7 @@ const ManageProducts = () => {
 
                         {/* Product Image */}
                         <Avatar
-                          src={product.image}
+                          src={getFullImageUrl(product.image)}
                           variant="rounded"
                           sx={{ width: '100%', height: 120, mb: 2 }}
                         />
@@ -313,7 +323,7 @@ const ManageProducts = () => {
                         <Typography variant="h6" color="primary">
                           ৳{product.price.toLocaleString()}
                         </Typography>
-                         <Typography variant="caption" display="block" color="text.secondary">
+                        <Typography variant="caption" display="block" color="text.secondary">
                           Stock: {product.countInStock || 0}
                         </Typography>
                       </Paper>
