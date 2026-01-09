@@ -18,7 +18,7 @@ import GavelIcon from '@mui/icons-material/Gavel';
 import TrophyIcon from '@mui/icons-material/EmojiEvents';
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 const BidHistoryPage = () => {
     const [bids, setBids] = useState([]);
@@ -150,3 +150,4 @@ const BidHistoryPage = () => {
 };
 
 export default BidHistoryPage;
+

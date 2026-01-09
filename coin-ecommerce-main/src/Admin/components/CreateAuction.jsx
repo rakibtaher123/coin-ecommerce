@@ -7,7 +7,7 @@ import {
 import axios from 'axios';
 import { Gavel, Image, Label, AccessTime, Category } from '@mui/icons-material';
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 const CATEGORIES = ["Gold", "Silver", "Ancient", "Mughal", "British India", "Republic India", "Foreign", "Notes", "Medals", "Tokens"];
 
@@ -332,3 +332,4 @@ const CreateAuction = ({ open, onClose, auctionData }) => {
 };
 
 export default CreateAuction;
+

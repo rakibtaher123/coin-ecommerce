@@ -41,7 +41,7 @@ const ClientProductsPage = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch(`http://localhost:5000/api/products`);
+            const response = await fetch(`https://gangaridai-auction.onrender.com/api/products`);
             const data = await response.json();
             setProducts(data);
             setFilteredProducts(data);
@@ -141,7 +141,7 @@ const ClientProductsPage = () => {
                                     <CardMedia
                                         component="img"
                                         height="200"
-                                        image={product.image.startsWith('http') ? product.image : `http://localhost:5000${product.image}`}
+                                        image={product.image.startsWith('http') ? product.image : `https://gangaridai-auction.onrender.com${product.image}`}
                                         alt={product.name}
                                         sx={{ objectFit: 'cover' }}
                                     />
@@ -189,3 +189,4 @@ const ClientProductsPage = () => {
 };
 
 export default ClientProductsPage;
+

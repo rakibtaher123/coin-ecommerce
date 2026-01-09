@@ -14,7 +14,7 @@ const ArchiveAuction = () => {
     const fetchArchives = async () => {
       try {
         // Fetch demo archives from database
-        const demoResponse = await fetch('http://localhost:5000/api/demo-archives');
+        const demoResponse = await fetch('https://gangaridai-auction.onrender.com/api/demo-archives');
         const demoData = await demoResponse.json();
 
         // Format demo archives to match display structure
@@ -33,7 +33,7 @@ const ArchiveAuction = () => {
         setDemoArchives(formattedDemoArchives);
 
         // Fetch real completed auctions
-        const response = await fetch('http://localhost:5000/api/auctions/archives');
+        const response = await fetch('https://gangaridai-auction.onrender.com/api/auctions/archives');
         const data = await response.json();
 
         // Format the real auctions to match our display structure
@@ -80,7 +80,7 @@ const ArchiveAuction = () => {
     // If it's a real auction, fetch realization data from backend
     if (auction.isRealAuction && auction.archiveId) {
       try {
-        const response = await fetch(`http://localhost:5000/api/auctions/realization/${auction.archiveId}`);
+        const response = await fetch(`https://gangaridai-auction.onrender.com/api/auctions/realization/${auction.archiveId}`);
         const data = await response.json();
 
         // Format realization data

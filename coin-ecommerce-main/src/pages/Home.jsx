@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Gavel, HistoryEdu, VerifiedUser, LocalShipping, EmojiEvents, ArrowForward } from '@mui/icons-material';
 
 // API URL
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 const HomePage = () => {
     const navigate = useNavigate();

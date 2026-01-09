@@ -17,7 +17,7 @@ const ClientCartPage = () => {
         if (!imagePath) return 'https://via.placeholder.com/150';
         return imagePath.startsWith('http')
             ? imagePath
-            : `http://localhost:5000${imagePath}`;
+            : `https://gangaridai-auction.onrender.com${imagePath}`;
     };
 
     const handleCheckoutClick = () => {
@@ -157,3 +157,4 @@ const ClientCartPage = () => {
 };
 
 export default ClientCartPage;
+

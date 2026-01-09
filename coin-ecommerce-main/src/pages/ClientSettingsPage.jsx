@@ -58,7 +58,7 @@ const ClientSettingsPage = () => {
         formData.append('image', file);
 
         try {
-            const response = await fetch('http://localhost:5000/api/upload', {
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/upload', {
                 method: 'POST',
                 body: formData
             });
@@ -83,7 +83,7 @@ const ClientSettingsPage = () => {
 
             if (!user || !token) return;
 
-            const response = await fetch('http://localhost:5000/api/auth/profile', {
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -129,7 +129,7 @@ const ClientSettingsPage = () => {
             const token = localStorage.getItem('token');
             const user = JSON.parse(localStorage.getItem('userInfo'));
 
-            const response = await fetch('http://localhost:5000/api/auth/profile', {
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/auth/profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ const ClientSettingsPage = () => {
                     {/* ✅ Image Upload Section */}
                     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 3 }}>
                         <Avatar
-                            src={formData.image ? `http://localhost:5000${formData.image}` : undefined}
+                            src={formData.image ? `https://gangaridai-auction.onrender.com${formData.image}` : undefined}
                             sx={{ width: 100, height: 100, mb: 1, border: '2px solid #ddd' }}
                         >
                             {formData.name.charAt(0)}
@@ -320,3 +320,4 @@ const ClientSettingsPage = () => {
 };
 
 export default ClientSettingsPage;
+

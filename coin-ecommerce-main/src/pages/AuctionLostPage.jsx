@@ -26,9 +26,9 @@ const AuctionLostPage = () => {
     const fetchAuction = async () => {
         try {
             // First check and update auction statuses
-            await axios.get('http://localhost:5000/api/auctions/utils/check-status');
+            await axios.get('https://gangaridai-auction.onrender.com/api/auctions/utils/check-status');
 
-            const { data } = await axios.get(`http://localhost:5000/api/auctions/${auctionId}`);
+            const { data } = await axios.get(`https://gangaridai-auction.onrender.com/api/auctions/${auctionId}`);
             setAuction(data);
 
             // ✅ IMPORTANT: First check if auction is actually ended
@@ -163,7 +163,7 @@ const AuctionLostPage = () => {
                                 justifyContent: 'center'
                             }}>
                                 <img
-                                    src={`http://localhost:5000${auction?.productImage}`}
+                                    src={`https://gangaridai-auction.onrender.com${auction?.productImage}`}
                                     alt={auction?.productName}
                                     style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px' }}
                                 />
@@ -305,3 +305,4 @@ const AuctionLostPage = () => {
 };
 
 export default AuctionLostPage;
+

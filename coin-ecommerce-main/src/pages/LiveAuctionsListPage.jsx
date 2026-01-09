@@ -15,7 +15,7 @@ const LiveAuctionsListPage = () => {
     // Fetch all active auctions from backend
     const fetchAuctions = async () => {
         try {
-            const { data } = await axios.get('http://localhost:5000/api/auctions');
+            const { data } = await axios.get('https://gangaridai-auction.onrender.com/api/auctions');
 
             // Filter for active/live auctions only
             const activeAuctions = data.filter(a =>
@@ -26,7 +26,7 @@ const LiveAuctionsListPage = () => {
             const formattedAuctions = activeAuctions.map(auction => ({
                 id: auction._id,
                 title: auction.productName,
-                image: auction.productImage ? `http://localhost:5000${auction.productImage}` : '/assets/default-coin.jpg',
+                image: auction.productImage ? `https://gangaridai-auction.onrender.com${auction.productImage}` : '/assets/default-coin.jpg',
                 currentBid: auction.currentPrice || auction.startingPrice || 0,
                 totalBids: auction.bids?.length || 0,
                 endDate: auction.endTime,
@@ -120,3 +120,4 @@ const LiveAuctionsListPage = () => {
 };
 
 export default LiveAuctionsListPage;
+

@@ -9,7 +9,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import axios from 'axios';
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 const LiveBiddingSystem = () => {
     const navigate = useNavigate();
@@ -211,3 +211,4 @@ const LiveBiddingSystem = () => {
 };
 
 export default LiveBiddingSystem;
+

@@ -24,7 +24,7 @@ const AdminPanel = () => {
 
   const fetchDashboardStats = async (token) => {
     try {
-      const response = await fetch("http://localhost:5000/api/dashboard-stats", {
+      const response = await fetch("https://gangaridai-auction.onrender.com/api/dashboard-stats", {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.ok) {

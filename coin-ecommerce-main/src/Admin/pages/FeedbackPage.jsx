@@ -7,7 +7,7 @@ const FeedbackPage = () => {
   // Feedback লোড করা
   const loadFeedbacks = async () => {
     try {
-      const response = await fetch('http://localhost:5000/feedback');
+      const response = await fetch('https://gangaridai-auction.onrender.com/feedback');
       const data = await response.json();
       setFeedbacks(data);
     } catch (error) {
@@ -44,3 +44,4 @@ const FeedbackPage = () => {
 };
 
 export default FeedbackPage;
+

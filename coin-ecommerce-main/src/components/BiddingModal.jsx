@@ -16,7 +16,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import axios from 'axios';
 import { useCart } from '../context/CartProvider';
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 const BiddingModal = ({ auction, isOpen, onClose, onBidPlaced }) => {
     const [bidAmount, setBidAmount] = useState('');
@@ -220,3 +220,4 @@ const BiddingModal = ({ auction, isOpen, onClose, onBidPlaced }) => {
 };
 
 export default BiddingModal;
+

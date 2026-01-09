@@ -26,7 +26,7 @@ const ManageUsers = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('http://localhost:5000/api/auth/users');
+      const response = await fetch('https://gangaridai-auction.onrender.com/api/auth/users');
 
       if (!response.ok) {
         throw new Error("Failed to fetch users");
@@ -75,7 +75,7 @@ const ManageUsers = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/users/${deleteDialog.userId}`, {
+      const response = await fetch(`https://gangaridai-auction.onrender.com/api/auth/users/${deleteDialog.userId}`, {
         method: 'DELETE',
       });
 
@@ -100,7 +100,7 @@ const ManageUsers = () => {
 
   const handleRoleSave = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/users/${userId}/role`, {
+      const response = await fetch(`https://gangaridai-auction.onrender.com/api/auth/users/${userId}/role`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: editingRole.newRole })
@@ -310,3 +310,4 @@ const ManageUsers = () => {
 };
 
 export default ManageUsers;
+

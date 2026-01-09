@@ -17,7 +17,7 @@ const ClientAuctionsPage = () => {
 
     const fetchAuctions = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/auctions');
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/auctions');
             const data = await response.json();
             setAuctions(data);
             setLoading(false);
@@ -189,3 +189,4 @@ const ClientAuctionsPage = () => {
 };
 
 export default ClientAuctionsPage;
+

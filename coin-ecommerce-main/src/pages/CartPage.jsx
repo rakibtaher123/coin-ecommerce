@@ -18,7 +18,7 @@ const CartPage = () => {
     // ✅ শুধু এই লাইনে error ছিল, এটা ঠিক করা হয়েছে
     return imagePath.startsWith('http')
       ? imagePath
-      : `http://localhost:5000${imagePath}`;
+      : `https://gangaridai-auction.onrender.com${imagePath}`;
   };
 
   const handleCheckoutClick = () => {
@@ -142,3 +142,4 @@ const CartPage = () => {
 };
 
 export default CartPage;
+

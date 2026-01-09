@@ -9,7 +9,7 @@ const HomePage = () => {
     const fetchProducts = async () => {
       try {
         // ১. আপনার লোকাল সার্ভারের সঠিক URL দেওয়া হলো
-        const response = await fetch('http://localhost:5000/products'); 
+        const response = await fetch('https://gangaridai-auction.onrender.com/products'); 
         
         if (!response.ok) {
           throw new Error('Network response was not ok');

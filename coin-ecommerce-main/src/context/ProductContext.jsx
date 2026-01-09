@@ -10,7 +10,7 @@ export const ProductProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   // ✅ Updated to use Vite Proxy
-  const API_BASE_URL = ""; // Empty string allows relative paths like /api/products
+  const API_BASE_URL = "https://gangaridai-auction.onrender.com"; // Updated to Render URL
 
   const fetchProducts = async () => {
     try {

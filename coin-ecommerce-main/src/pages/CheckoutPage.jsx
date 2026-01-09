@@ -43,7 +43,7 @@ function CheckoutPage() {
   // ✅ ইমেজ ফিক্স করার ফাংশন
   const getImageUrl = (imagePath) => {
     if (!imagePath) return 'https://via.placeholder.com/150';
-    return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+    return imagePath.startsWith('http') ? imagePath : `https://gangaridai-auction.onrender.com${imagePath}`;
   };
 
   // Handlers
@@ -101,7 +101,7 @@ function CheckoutPage() {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/orders', {
+      const response = await fetch('https://gangaridai-auction.onrender.com/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -402,5 +402,6 @@ function CheckoutPage() {
 }
 
 export default CheckoutPage;
+
 
 

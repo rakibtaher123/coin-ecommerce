@@ -6,7 +6,7 @@ import { useCart } from '../context/CartProvider';
 // import { useProducts } from '../context/ProductContext'; // পুরো লিস্ট লোডের দরকার নেই
 
 // API Base URL (ProductContext এর সাথে সামঞ্জস্যপূর্ণ)
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 // ✅ ইমেজ URL ফিক্স ফাংশন
 const getFullImageUrl = (imagePath) => {

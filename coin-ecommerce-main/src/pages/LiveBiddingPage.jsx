@@ -25,9 +25,9 @@ const LiveBiddingPage = () => {
     const fetchActiveAuctions = async () => {
         try {
             // Trigger status check
-            await axios.get('http://localhost:5000/api/auctions/utils/check-status');
+            await axios.get('https://gangaridai-auction.onrender.com/api/auctions/utils/check-status');
 
-            const { data } = await axios.get('http://localhost:5000/api/auctions');
+            const { data } = await axios.get('https://gangaridai-auction.onrender.com/api/auctions');
 
             // Show active auctions + closed auctions where current user is winner
             const relevantAuctions = data.filter(a => {
@@ -86,7 +86,7 @@ const LiveBiddingPage = () => {
         }
 
         try {
-            await axios.post('http://localhost:5000/api/auctions/bid',
+            await axios.post('https://gangaridai-auction.onrender.com/api/auctions/bid',
                 { auctionId: selectedAuction._id, bidAmount: amount },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -115,7 +115,7 @@ const LiveBiddingPage = () => {
 
         try {
             const response = await axios.post(
-                `http://localhost:5000/api/auctions/${selectedAuction._id}/pay`,
+                `https://gangaridai-auction.onrender.com/api/auctions/${selectedAuction._id}/pay`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -198,7 +198,7 @@ const LiveBiddingPage = () => {
                     {selectedAuction.productImage && (
                         <Box sx={{ mt: 3, p: 2, bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2 }}>
                             <img
-                                src={`http://localhost:5000${selectedAuction.productImage}`}
+                                src={`https://gangaridai-auction.onrender.com${selectedAuction.productImage}`}
                                 alt={selectedAuction.productName}
                                 style={{ maxWidth: '300px', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px' }}
                             />
@@ -526,3 +526,4 @@ const styles = {
 };
 
 export default LiveBiddingPage;
+

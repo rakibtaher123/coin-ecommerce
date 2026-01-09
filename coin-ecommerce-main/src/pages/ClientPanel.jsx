@@ -46,7 +46,7 @@ const ClientPanel = () => {
     // Fetch real dashboard stats from backend
     const fetchStats = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/client/dashboard-stats', {
+        const response = await fetch('https://gangaridai-auction.onrender.com/api/client/dashboard-stats', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -298,3 +298,4 @@ const ClientPanel = () => {
 };
 
 export default ClientPanel;
+

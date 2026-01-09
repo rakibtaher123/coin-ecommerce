@@ -15,7 +15,7 @@ const ClientPaymentsPage = () => {
         const fetchOrders = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch('http://localhost:5000/api/orders/myorders', {
+                const response = await fetch('https://gangaridai-auction.onrender.com/api/orders/myorders', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 if (response.ok) {
@@ -118,3 +118,4 @@ const ClientPaymentsPage = () => {
 };
 
 export default ClientPaymentsPage;
+

@@ -22,7 +22,7 @@ const ClientOrderDetailsPage = () => {
                     return;
                 }
 
-                const response = await fetch(`http://localhost:5000/api/orders/${id}`, {
+                const response = await fetch(`https://gangaridai-auction.onrender.com/api/orders/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
@@ -114,7 +114,7 @@ const ClientOrderDetailsPage = () => {
                                                 <TableCell>
                                                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                         <img
-                                                            src={item.image.startsWith('http') ? item.image : `http://localhost:5000${item.image}`}
+                                                            src={item.image.startsWith('http') ? item.image : `https://gangaridai-auction.onrender.com${item.image}`}
                                                             alt={item.name}
                                                             style={{ width: 50, height: 50, objectFit: 'cover', borderRadius: 4, marginRight: 16 }}
                                                             onError={(e) => { e.target.src = 'https://via.placeholder.com/50' }}

@@ -25,7 +25,7 @@ const CATEGORIES = [
   "Bd Republic Notes"
 ];
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 const getFullImageUrl = (imagePath) => {
   if (imagePath && !imagePath.startsWith('http')) {

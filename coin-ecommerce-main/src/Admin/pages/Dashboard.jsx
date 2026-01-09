@@ -97,7 +97,7 @@ const Dashboard = () => {
     // 2. Fetch Stats
     const fetchStats = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/dashboard-stats');
+        const res = await fetch('https://gangaridai-auction.onrender.com/api/dashboard-stats');
         const data = await res.json();
         if (data.success) {
           setStats({
@@ -118,7 +118,7 @@ const Dashboard = () => {
     fetchStats();
 
     // 3. Socket.io for Real-time New Order Alerts
-    const socket = io('http://localhost:5000');
+    const socket = io('https://gangaridai-auction.onrender.com');
     socket.on('new_order', (data) => {
       setNotification({
         open: true,

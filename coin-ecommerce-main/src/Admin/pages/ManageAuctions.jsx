@@ -13,7 +13,7 @@ import axios from 'axios';
 // কম্পোনেন্ট ইম্পোর্ট
 import CreateAuction from '../components/CreateAuction';
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 const ManageAuctions = () => {
   const [auctions, setAuctions] = useState([]);
@@ -269,3 +269,4 @@ const ManageAuctions = () => {
 };
 
 export default ManageAuctions;
+

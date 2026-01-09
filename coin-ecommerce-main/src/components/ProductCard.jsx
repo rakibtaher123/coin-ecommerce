@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartProvider';
 
 // API URL (ইমেজ লোডিংয়ের জন্য)
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "https://gangaridai-auction.onrender.com";
 
 function ProductCard({ product }) {
   const navigate = useNavigate();

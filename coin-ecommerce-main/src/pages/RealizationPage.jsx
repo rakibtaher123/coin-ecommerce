@@ -15,7 +15,7 @@ const RealizationPage = () => {
 
     const fetchRealizations = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/auctions');
+            const response = await axios.get('https://gangaridai-auction.onrender.com/api/auctions');
             const allAuctions = response.data;
 
             // Filter Logic:
@@ -121,3 +121,4 @@ const RealizationPage = () => {
 };
 
 export default RealizationPage;
+

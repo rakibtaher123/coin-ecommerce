@@ -35,7 +35,7 @@ const ManageArchives = () => {
 
     const fetchDemoArchives = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/demo-archives');
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/demo-archives');
             const data = await response.json();
             setDemoArchives(data);
         } catch (error) {
@@ -47,7 +47,7 @@ const ManageArchives = () => {
 
     const fetchCompletedAuctions = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/auctions');
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/auctions');
             const data = await response.json();
             const completed = data.filter(auction => auction.status === 'closed' || auction.status === 'sold');
             setCompletedAuctions(completed);
@@ -96,8 +96,8 @@ const ManageArchives = () => {
     const handleSubmit = async () => {
         const token = localStorage.getItem('token');
         const url = editMode
-            ? `http://localhost:5000/api/demo-archives/${currentArchive._id}`
-            : 'http://localhost:5000/api/demo-archives';
+            ? `https://gangaridai-auction.onrender.com/api/demo-archives/${currentArchive._id}`
+            : 'https://gangaridai-auction.onrender.com/api/demo-archives';
 
         const method = editMode ? 'PUT' : 'POST';
 
@@ -129,7 +129,7 @@ const ManageArchives = () => {
 
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:5000/api/demo-archives/${id}`, {
+            const response = await fetch(`https://gangaridai-auction.onrender.com/api/demo-archives/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -150,7 +150,7 @@ const ManageArchives = () => {
 
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:5000/api/auctions/${id}`, {
+            const response = await fetch(`https://gangaridai-auction.onrender.com/api/auctions/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
@@ -416,3 +416,4 @@ const ManageArchives = () => {
 };
 
 export default ManageArchives;
+

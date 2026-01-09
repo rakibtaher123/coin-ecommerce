@@ -1,23 +1,30 @@
 import axios from "axios";
-const API_URL = 'http://localhost:5000/api/auth';
+
+const BASE_URL = import.meta.env.VITE_API_URL ?? "https://gangaridai-auction.onrender.com";
+const api = axios.create({
+  baseURL: `${BASE_URL}/api`,
+  headers: { "Content-Type": "application/json" },
+});
 
 export const registerUser = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/register`, data);
-    return response;
+    const response = await api.post("/auth/register", data);
+    return response.data;
   } catch (error) {
-    throw error.response || { data: { error: "Server error" }, status: 500 };
+    const err = error?.response?.data || { error: "Server error" };
+    throw err;
   }
 };
 
 export const loginUser = async (data) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, {
+    const response = await api.post("/auth/login", {
       email: data.email,
-      password: data.password
+      password: data.password,
     });
-    return response;
+    return response.data;
   } catch (error) {
-    throw error.response || { data: { error: "Server error" }, status: 500 };
+    const err = error?.response?.data || { error: "Server error" };
+    throw err;
   }
 };

@@ -75,7 +75,7 @@ const PaymentConfirm = () => {
             };
 
             // API Call
-            const response = await fetch('http://localhost:5000/api/payment/initiate', {
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/payment/initiate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -253,3 +253,4 @@ const PaymentConfirm = () => {
 };
 
 export default PaymentConfirm;
+

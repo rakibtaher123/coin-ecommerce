@@ -36,7 +36,7 @@ const ClientOrdersPage = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:5000/api/orders/myorders`, {
+            const response = await fetch(`https://gangaridai-auction.onrender.com/api/orders/myorders`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -82,7 +82,7 @@ const ClientOrdersPage = () => {
 
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+            const response = await fetch(`https://gangaridai-auction.onrender.com/api/orders/${orderId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -240,4 +240,5 @@ const ClientOrdersPage = () => {
 };
 
 export default ClientOrdersPage;
+
 

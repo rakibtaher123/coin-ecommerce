@@ -98,7 +98,7 @@ const PaymentPage = () => {
             };
 
             // Create order in database
-            const response = await fetch('http://localhost:5000/api/orders', {
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/orders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -179,7 +179,7 @@ const PaymentPage = () => {
             };
 
             // Create order in database
-            const response = await fetch('http://localhost:5000/api/orders', {
+            const response = await fetch('https://gangaridai-auction.onrender.com/api/orders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -487,3 +487,4 @@ const PaymentPage = () => {
 };
 
 export default PaymentPage;
+

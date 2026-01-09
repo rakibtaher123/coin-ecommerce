@@ -6,7 +6,7 @@ import axios from "axios";
 import { AuthContext } from "../context/AuthContext"; // Assuming you have an AuthContext
 
 // Connect to Backend Socket
-const socket = io.connect("http://localhost:5000");
+const socket = io.connect("https://gangaridai-auction.onrender.com");
 
 const LiveAuctionPage = () => {
   const { id } = useParams(); // Auction ID from URL
@@ -25,7 +25,7 @@ const LiveAuctionPage = () => {
   useEffect(() => {
     const fetchAuction = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/auctions/${id}`);
+        const res = await axios.get(`https://gangaridai-auction.onrender.com/api/auctions/${id}`);
         const data = res.data;
 
         setAuction(data);
@@ -161,7 +161,7 @@ const LiveAuctionPage = () => {
               <Box sx={{ bgcolor: "#3e0e0e", p: 4, display: 'flex', justifyContent: 'center' }}>
                 <CardMedia
                   component="img"
-                  image={auction.productImage ? `http://localhost:5000${auction.productImage}` : "https://via.placeholder.com/500x400"}
+                  image={auction.productImage ? `https://gangaridai-auction.onrender.com${auction.productImage}` : "https://via.placeholder.com/500x400"}
                   alt={auction.productName}
                   sx={{
                     height: 400,

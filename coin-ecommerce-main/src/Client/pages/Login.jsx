@@ -21,7 +21,7 @@ function Login() {
 
     try {
       // ✅ Correct API endpoint
-      const res = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+      const res = await axios.post('https://gangaridai-auction.onrender.com/api/auth/login', { email, password });
 
       if (res.data?.token && res.data?.user?.role) {
         // ✅ Save token + role + email
@@ -126,3 +126,4 @@ const inputStyle = {
 };
 
 export default Login;
+
