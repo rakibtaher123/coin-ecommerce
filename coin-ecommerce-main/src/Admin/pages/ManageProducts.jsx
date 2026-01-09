@@ -75,7 +75,7 @@ const ManageProducts = () => {
   // Fetch products
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products');
+      const res = await fetch(`${API_BASE_URL}/api/products`);
       const data = await res.json();
       setProducts(data);
     } catch (error) {
@@ -154,7 +154,7 @@ const ManageProducts = () => {
       formData.append('image', imageFile);
     }
 
-    const url = isEditMode ? `/api/products/${editProductId}` : '/api/products';
+    const url = isEditMode ? `${API_BASE_URL}/api/products/${editProductId}` : `${API_BASE_URL}/api/products`;
     const method = isEditMode ? 'PUT' : 'POST';
 
     // টোকেন নিয়ে আসা
@@ -201,7 +201,7 @@ const ManageProducts = () => {
     const token = getToken(); // টোকেন আনা
 
     try {
-      const response = await fetch(`/api/products/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/products/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}` // টোকেন পাঠানো
