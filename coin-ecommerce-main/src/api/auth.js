@@ -6,25 +6,9 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-export const registerUser = async (data) => {
-  try {
-    const response = await api.post("/auth/register", data);
-    return response.data;
-  } catch (error) {
-    const err = error?.response?.data || { error: "Server error" };
-    throw err;
-  }
-};
+export const registerUser = (data) => api.post("/auth/register", data);
 
-export const loginUser = async (data) => {
-  try {
-    const response = await api.post("/auth/login", {
-      email: data.email,
-      password: data.password,
-    });
-    return response.data;
-  } catch (error) {
-    const err = error?.response?.data || { error: "Server error" };
-    throw err;
-  }
-};
+export const loginUser = (data) => api.post("/auth/login", {
+  email: data.email,
+  password: data.password,
+});

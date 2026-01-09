@@ -47,7 +47,7 @@ const RegisterPage = () => {
       }
     } catch (err) {
       console.error(err);
-      setError(err.data?.message || err.data?.error || 'Registration Failed. Please try again.');
+      setError(err.response?.data?.message || err.response?.data?.error || err.message || 'Registration Failed. Please try again.');
     } finally {
       setLoading(false);
     }
