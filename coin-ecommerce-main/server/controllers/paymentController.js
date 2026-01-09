@@ -16,10 +16,10 @@ exports.initiatePayment = async (req, res) => {
             total_amount: amount,
             currency: 'BDT',
             tran_id: tran_id,
-            success_url: `http://localhost:5000/api/payment/success`,
-            fail_url: `http://localhost:5000/api/payment/fail`,
-            cancel_url: `http://localhost:5000/api/payment/cancel`,
-            ipn_url: `http://localhost:5000/api/payment/ipn`,
+            success_url: `https://gangaridai-auction.onrender.com/api/payment/success`,
+            fail_url: `https://gangaridai-auction.onrender.com/api/payment/fail`,
+            cancel_url: `https://gangaridai-auction.onrender.com/api/payment/cancel`,
+            ipn_url: `https://gangaridai-auction.onrender.com/api/payment/ipn`,
             shipping_method: 'Courier',
             product_name: orderInfo.productName || 'Coins',
             product_category: 'Collectibles',
@@ -80,10 +80,10 @@ exports.paymentSuccess = async (req, res) => {
         // TODO: Update order status to 'paid'
 
         // Redirect to frontend success page
-        res.redirect(`http://localhost:5173/payment-success?tran_id=${req.body.tran_id}`);
+        res.redirect(`https://gangaridai-auction.vercel.app/payment-success?tran_id=${req.body.tran_id}`);
     } catch (error) {
         console.error('Success Handler Error:', error);
-        res.redirect('http://localhost:5173/payment-failed');
+        res.redirect('https://gangaridai-auction.vercel.app/payment-failed');
     }
 };
 
@@ -93,10 +93,10 @@ exports.paymentFail = async (req, res) => {
         console.log('Payment Failed:', req.body);
 
         // Redirect to frontend failure page
-        res.redirect(`http://localhost:5173/payment-failed?reason=${req.body.error || 'unknown'}`);
+        res.redirect(`https://gangaridai-auction.vercel.app/payment-failed?reason=${req.body.error || 'unknown'}`);
     } catch (error) {
         console.error('Fail Handler Error:', error);
-        res.redirect('http://localhost:5173/payment-failed');
+        res.redirect('https://gangaridai-auction.vercel.app/payment-failed');
     }
 };
 
@@ -106,10 +106,10 @@ exports.paymentCancel = async (req, res) => {
         console.log('Payment Cancelled:', req.body);
 
         // Redirect to frontend with cancel message
-        res.redirect('http://localhost:5173/payment-failed?reason=cancelled');
+        res.redirect('https://gangaridai-auction.vercel.app/payment-failed?reason=cancelled');
     } catch (error) {
         console.error('Cancel Handler Error:', error);
-        res.redirect('http://localhost:5173/payment-failed');
+        res.redirect('https://gangaridai-auction.vercel.app/payment-failed');
     }
 };
 
