@@ -89,7 +89,7 @@ const ManageProducts = () => {
 
   // Group products by category
   const getProductsByCategory = (category) => {
-    return products.filter(p => p.category === category);
+    return products.filter(p => p.category?.trim().toLowerCase() === category.trim().toLowerCase());
   };
 
   // Open add product dialog
@@ -225,6 +225,13 @@ const ManageProducts = () => {
       <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>
         📦 Manage Products by Category
       </Typography>
+
+      {/* DEBUG SECTION - REMOVE LATER */}
+      <Box sx={{ p: 2, mb: 4, bgcolor: '#fff3cd', border: '1px solid #ffeeba', borderRadius: 2 }}>
+        <Typography variant="h6" color="warning.main">🚧 Debug Info</Typography>
+        <Typography><strong>Total Products Fetched:</strong> {products.length}</Typography>
+        <Typography><strong>Categories found in DB:</strong> {Array.from(new Set(products.map(p => p.category))).join(', ') || "None"}</Typography>
+      </Box>
 
       {/* Category Accordions */}
       {CATEGORIES.map((category, index) => {
